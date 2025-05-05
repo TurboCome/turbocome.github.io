@@ -186,13 +186,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -234,7 +234,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2025/05/02/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E7%B4%A2%E5%BC%95%E4%BA%8B%E5%8A%A1%E8%81%94%E6%8E%A5/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/05/05/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E4%BA%8B%E5%8A%A1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar/avatar.jpg">
@@ -252,7 +252,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2025/05/02/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E7%B4%A2%E5%BC%95%E4%BA%8B%E5%8A%A1%E8%81%94%E6%8E%A5/" class="post-title-link" itemprop="url">Mysql索引&事务&联接</a>
+          <a href="/2025/05/05/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E4%BA%8B%E5%8A%A1/" class="post-title-link" itemprop="url">Mysql事务</a>
         </h2>
 
         <div class="post-meta-container">
@@ -263,7 +263,99 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2025-05-02 23:43:43" itemprop="dateCreated datePublished" datetime="2025-05-02T23:43:43+08:00">2025-05-02</time>
+      <time title="创建时间：2025-05-05 19:14:43" itemprop="dateCreated datePublished" datetime="2025-05-05T19:14:43+08:00">2025-05-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Mysql/%E4%BA%8B%E5%8A%A1/" itemprop="url" rel="index"><span itemprop="name">事务</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+          
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="事务四大特性"><a href="#事务四大特性" class="headerlink" title="事务四大特性"></a>事务四大特性</h1><h2 id="原子性："><a href="#原子性：" class="headerlink" title="原子性："></a>原子性：</h2><p>保障：undo log</p>
+<p><strong>定义：</strong>一系列操作要么全执行，要么全不执行；</p>
+<p><strong>原理</strong>：通过undo log实现，undo log属于逻辑日志，保证事务原子性，记录 sql执行相关的信息，当发生回滚时，会根据undo log内容做与之前相反的工作。例如：对于每个insert，回滚时会执行delete；对于每个update，回滚时会执行一个相反的update，把数据改回去。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/05/05/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E4%BA%8B%E5%8A%A1/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/05/04/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E7%B4%A2%E5%BC%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar/avatar.jpg">
+      <meta itemprop="name" content="TurboCome">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TurboCome">
+      <meta itemprop="description" content="学而不思则罔，思而不学则殆！">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | TurboCome">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2025/05/04/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E7%B4%A2%E5%BC%95/" class="post-title-link" itemprop="url">Mysql索引</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-05-04 22:43:43" itemprop="dateCreated datePublished" datetime="2025-05-04T22:43:43+08:00">2025-05-04</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -297,7 +389,7 @@
 <p>InnoDB采用 MVCC方式支持高并发，实现四个标准隔离级别(未提交读、已提交读、可重复读-默认、可串行化)。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2025/05/02/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E7%B4%A2%E5%BC%95%E4%BA%8B%E5%8A%A1%E8%81%94%E6%8E%A5/#more" rel="contents">
+              <a class="btn" href="/2025/05/04/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E7%B4%A2%E5%BC%95/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
