@@ -295,86 +295,14 @@
 <li>聚簇索引，叶子节点data域存行记录</li>
 </ul>
 <p>InnoDB采用 MVCC方式支持高并发，实现四个标准隔离级别(未提交读、已提交读、可重复读-默认、可串行化)。</p>
-<img src="https://p.ipic.vip/00k56m.png" alt="image-20250505170309173" style="zoom:50%;" />
-
-
-
-<h3 id="MyIsam索引"><a href="#MyIsam索引" class="headerlink" title="MyIsam索引"></a>MyIsam索引</h3><ul>
-<li>不支持 事务，外键，行锁；   </li>
-<li>非聚簇索引，叶子节点data域中存引用地址；</li>
-</ul>
-<img src="https://p.ipic.vip/cbpixz.png" alt="image-20250505170800761" style="zoom:80%;" />
-
-<h3 id="索引优缺点"><a href="#索引优缺点" class="headerlink" title="索引优缺点"></a>索引优缺点</h3><h4 id="索引优点"><a href="#索引优点" class="headerlink" title="索引优点"></a>索引优点</h4><ul>
-<li>提高数据查询效率，降低数据库 IO成本；</li>
-<li>被索引的列会自动排序，包括单列索引&amp;组合索引，按照索引列排序，order by语句效率更高；</li>
-</ul>
-<h4 id="索引缺点"><a href="#索引缺点" class="headerlink" title="索引缺点"></a>索引缺点</h4><ul>
-<li>索引会占磁盘空间；</li>
-<li>索引会降低更新表的效率，每次对表增删改，不仅要更新数据，还要更新对应的索引；</li>
-</ul>
-<h3 id="索引结构"><a href="#索引结构" class="headerlink" title="索引结构"></a><strong>索引结构</strong></h3><p><strong>Hash :</strong>  不适合范围查找；无法用于排序与分组；</p>
-<p><strong>二叉树：</strong>根节点的取值，容易导致 二叉树不分叉，降低查询效率；</p>
-<p><strong>平衡二叉树：</strong>不支持 范围查询，范围查询时需要从根节点多次遍历，效率低；</p>
-<h4 id="B树："><a href="#B树：" class="headerlink" title="B树："></a><strong>B树：</strong></h4><ul>
-<li>B树<strong>不支持范围查询，</strong>在非叶子节点中也保存数据记录；</li>
-<li>每个节点的 data域存储 行记录，行的大小随着列数的增多而变大，这时页中可存储的数据量会变少，树结构会变高，磁盘IO次数就会变多；</li>
-</ul>
-<h4 id="B-树结构："><a href="#B-树结构：" class="headerlink" title="B+树结构："></a><strong>B+树结构：</strong></h4><ul>
-<li>支持范围查询，只在叶子节点data域中存数据；且主键具备唯一性，不需再向后查找，&lt;&#x3D;终止；</li>
-<li><strong>IO读取一页（默认16K）</strong>数据，数据存储在磁盘中，查询数据时，需要先把 磁盘中的数据加载到内存，磁盘IO操作很耗时，所以优化重点就是 尽量减少磁盘 IO 操作。B+树在非叶子中仅保存索引（不保存数据），相比B树存储同样多的数据，树的高度会更低，从而减少磁盘IO；</li>
-</ul>
-<h3 id="各种索引"><a href="#各种索引" class="headerlink" title="各种索引"></a>各种索引</h3><h4 id="主键索引"><a href="#主键索引" class="headerlink" title="主键索引"></a>主键索引</h4><p><strong>主键索引 &#x3D;&#x3D; 聚簇索引</strong>，当一个表没有创建主键索引时，InnoDB会自动构建聚簇索引。</p>
-<ul>
-<li>在表上定义 主键 PRIMARY KEY，InnoDB 将 <strong>主键索引用作聚簇索引；</strong>                                                     </li>
-<li>如果表没有定义主键，InnoDB会选择 <strong>第一个不为NULL的唯一索引列</strong>  用作聚簇索引；</li>
-<li>以上两个都没有，会使用一个 6 字节长整型字段构建聚簇索引，该 ROWID字段会在插入新行时自动递增；</li>
-</ul>
-<h4 id="辅助索引"><a href="#辅助索引" class="headerlink" title="辅助索引"></a><strong>辅助索引</strong></h4><p>聚簇索引之外的所有其他索引。</p>
-<p><strong>索引查询过程：</strong>非主键索引（辅助索引）的其他索引查询，需要先根据辅助索引B+树找到叶子节点data域中存储的主键索引，再根据主键索引找到实际数据。</p>
-<img src="https://p.ipic.vip/7h0w0m.png" alt="image-20250505172417504" style="zoom: 50%;" />
-
-<h4 id="前缀索引"><a href="#前缀索引" class="headerlink" title="前缀索引"></a><strong>前缀索引</strong></h4><p>定义字符串的一部分作为索引，如果创建索引的语句不指定前缀长度，索引默认包含整个字符串。</p>
-<p><strong>优点：</strong>定义好长度可以做到节省空间，又不用额外增加太多的查询成本。</p>
-<p><strong>注意：</strong>有前缀索引的联合索引<strong>一定会回表，虽然</strong>联合索引已包含相关信息，但还是会回表，因为有前缀索引，不确定到底是不是一个完整的信息。例如： <a href="mailto:www.aobing@mogu.com">www.aobing@mogu.com</a> 一个完整的邮箱去查询，但无法判断后续是否有数据，不知道是否是完整的数据，所以需要回表去判断。</p>
-<h4 id="联合索引"><a href="#联合索引" class="headerlink" title="联合索引"></a>联合索引</h4><h5 id="联合索引设计原则"><a href="#联合索引设计原则" class="headerlink" title="联合索引设计原则"></a><strong>联合索引设计原则</strong></h5><ul>
-<li>频繁使用的列、<strong>区分度高</strong>的列放在前面；</li>
-<li>范围查询的列放在复合索引的最后面，例如 idx_status_create_time；</li>
-<li>将常需要作为 查询返回的字段，增加到联合索引中，通过联合索引上增加字段来使用覆盖索引；</li>
-</ul>
-<h5 id="联合索引优势"><a href="#联合索引优势" class="headerlink" title="联合索引优势"></a><strong>联合索引优势</strong></h5><p><strong>1.减少开销：</strong> 建联合索引(col1,col2,col3)，实际相当于建 (col1),(col1,col2),(col1,col2,col3)三个索引,每多一个索引，都会增加写操作的开销和磁盘空间的开销。对于大量数据的表，使用联合索引可以有效的减少开销！</p>
-<p><strong>2.覆盖索引：</strong>联合索引通过遍历索引取得数据，无需回表，减少io操作，提升性能；</p>
-<p><strong>3.效率高：</strong> 索引列越多，通过索引筛选出的数据越少。</p>
-<p>例如：有1000W条数据的表，有如下sql：select from table where col1&#x3D;1 and col2&#x3D;2 and col3&#x3D;3, 假设每个条件可以筛选出10%数据，如果只有单值索引，那么通过该索引能筛选出1000W10%&#x3D;100w条数据，然后再回表从 100w条数据中找到符合col2&#x3D;2 and col3&#x3D; 3的数据，然后再排序，再分页；</p>
-<p>如果是联合索引，通过索引筛选出1000w10% 10% *10%&#x3D;1w，效率明显提升。</p>
-<h5 id="联合索引查询过程"><a href="#联合索引查询过程" class="headerlink" title="联合索引查询过程"></a>联合索引查询过程</h5><p><img src="https://p.ipic.vip/dlwr15.png" alt="image-20250505173752242"></p>
-<h4 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a><strong>覆盖索引</strong></h4><p>由多个字段组合成的联合索引，如：idx_abc(a,b,c)索引，在查询时，如果只需要 abc字段，则查询到联合索引的叶子节点就可以直接返回，不需要回表。</p>
-<p>注：Mysql优化器会根据联合索引字段位置，调整where 后边的查询条件，让其满足索引顺序。</p>
-<h5 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h5><p>创建 idx_abc(a,b,c)索引，相当于创建 (a)、（a,b）（a,b,c）三个索引，节省空间。在执行sql时，优化器会调整where后a,b,c的顺序，让其用上索引。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> <span class="keyword">table</span> </span><br><span class="line"><span class="keyword">WHERE</span> a <span class="keyword">IN</span> (<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>) <span class="keyword">and</span> b <span class="operator">&gt;</span> <span class="number">1</span>; </span><br><span class="line">还是对(a，b)建立索引，因为 <span class="keyword">IN</span>可视为等值引用，不会中止索引匹配，所以还是(a,b)</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> <span class="keyword">table</span> </span><br><span class="line"><span class="keyword">WHERE</span> a <span class="operator">&gt;</span> <span class="number">1</span> <span class="keyword">and</span> b <span class="operator">=</span> <span class="number">2</span> <span class="keyword">and</span> c <span class="operator">&gt;</span> <span class="number">3</span>; </span><br><span class="line">(b,a)或者(b,c)都可以，要结合具体情况具体分析。</span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t <span class="keyword">where</span> a<span class="operator">=</span><span class="number">1</span> <span class="keyword">and</span> b<span class="operator">=</span><span class="number">1</span> <span class="keyword">and</span> c <span class="operator">=</span><span class="number">1</span>;  #这样可以利用到定义的索引（a,b,c）,用上a,b,c </span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t <span class="keyword">where</span> a<span class="operator">=</span><span class="number">1</span> <span class="keyword">and</span> b<span class="operator">=</span><span class="number">1</span>;           #这样可以利用到定义的索引（a,b,c）,用上a,b </span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t <span class="keyword">where</span> b<span class="operator">=</span><span class="number">1</span> <span class="keyword">and</span> a<span class="operator">=</span><span class="number">1</span>;     #这样可以利用到定义的索引（a,b,c）,用上a,b（mysql有查询优化器） </span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t <span class="keyword">where</span> a<span class="operator">=</span><span class="number">1</span>;             #这样也可以利用到定义的索引（a,b,c）,用上a </span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t <span class="keyword">where</span> b<span class="operator">=</span><span class="number">1</span> <span class="keyword">and</span> c<span class="operator">=</span><span class="number">1</span>;     #这样不可以利用到定义的索引（a,b,c）； 最左 a 不匹配</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t <span class="keyword">where</span> a<span class="operator">=</span><span class="number">1</span> <span class="keyword">and</span> c<span class="operator">=</span><span class="number">1</span>;     #这样可以利用到定义的索引（a,b,c），但只用上a索引，b,c索引用不到 </span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="最左匹配原则"><a href="#最左匹配原则" class="headerlink" title="最左匹配原则"></a><strong>最左匹配原则</strong></h4><ul>
-<li>联合索引查询时，Mysql一直向右匹配，直至遇到范围查询 ( &gt;、&lt;、between、like ) 停止匹配。推荐使用联合索引替代多个单列索引使用。</li>
-<li>联合索引只有先确定前一个（左侧的值）后，才能确定下一个值。如果有范围查询，联合索引中使用范围查询的字段后的索引在该条 SQL 中都不会起作用。</li>
-<li>注意：<strong>in 和 &#x3D;  都可以乱序</strong>，比如有索引（a,b,c），语句 select * from t where c &#x3D;1 and a&#x3D;1 and b&#x3D;1，这样的语句也可以用到最左匹配，因为 MySQL优化器会分析 SQL 语句，将其优化成索引可以匹配的形式，即 select * from t where a &#x3D;1 and a&#x3D;1 and c&#x3D;1。</li>
-</ul>
-<h4 id="索引设置建议"><a href="#索引设置建议" class="headerlink" title="索引设置建议"></a><strong>索引设置建议</strong></h4><ul>
-<li>尽量保持自增；</li>
-<li>差异性大的字段；</li>
-<li>出现频率高的字段，或常在where条件中出现的字段；</li>
-<li>小字段（减少所占用的空间）；</li>
-</ul>
-<h4 id="破坏索引方式"><a href="#破坏索引方式" class="headerlink" title="破坏索引方式"></a><strong>破坏索引方式</strong></h4><p>1.索引列 有函数运算</p>
-<p>2.索引列 有  !&#x3D;   &lt;&gt;    not in    not exist </p>
-<p>3.like 条件使索引生效，like后不能以%开头， like %字段名%、like %字段名 这类语句会使索引失效；</p>
-<p>4.字符型索引列；  </p>
-<p>5.隐式类型转换；</p>
-<p><strong>示例：</strong>select * from t where id &#x3D; 1; 如果 id 是字符类型的，1是数字类型的，Mysql底层会对 比较进行转换，相当于加了 cast( id AS signed int ) 这样的函数，函数会导致走不上索引。 </p>
-<p><strong>示例：</strong>FROM_UNIXTIME(create_time) &#x3D; ‘2016-06-06’ ，不会使用索引，B+树中存储的都是数据表中的字段值，但是进行检索时，需要把所有元素都应用函数才能比较；</p>
-<p><strong>优化：</strong>create_time &#x3D; UNIX_TIMESTAMP(‘2016-06-06’)；</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/05/02/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E7%B4%A2%E5%BC%95%E4%BA%8B%E5%8A%A1%E8%81%94%E6%8E%A5/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
