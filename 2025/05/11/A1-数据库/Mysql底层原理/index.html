@@ -27,9 +27,9 @@
 <meta property="og:description" content="BufferPool原理原理：对于数据的修改，Mysql不会直接去修改磁盘数据，这样做太慢了，Mysql会先记录 redo log，再改内存BufferPool，等空闲时再刷磁盘，查询时如果内存 BufferPool里没有数据就去磁盘 load； Mysql以16KB「页」为读取和写入单位，一「页」里有多行数据，写数据时，Mysql会先写内存中的页，然后再刷新到磁盘。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://p.ipic.vip/iqax6b.png">
-<meta property="og:image" content="http://example.com/Library/Application%20Support/typora-user-images/image-20250511222825734.png">
+<meta property="og:image" content="https://p.ipic.vip/q9g5dg.png">
 <meta property="article:published_time" content="2025-05-11T11:14:43.000Z">
-<meta property="article:modified_time" content="2025-05-18T03:25:38.781Z">
+<meta property="article:modified_time" content="2025-05-18T03:27:41.632Z">
 <meta property="article:author" content="TurboCome">
 <meta property="article:tag" content="Mysql">
 <meta name="twitter:card" content="summary">
@@ -333,8 +333,7 @@
 <li>系统后台线程定期 merge</li>
 <li>数据库正常关闭（shutdown）过程中会执行merge</li>
 </ul>
-<h4 id="Mysql底层结构示意图"><a href="#Mysql底层结构示意图" class="headerlink" title="Mysql底层结构示意图"></a>Mysql底层结构示意图</h4><img src="../../../../../Library/Application%20Support/typora-user-images/image-20250511222825734.png" alt="image-20250511222825734" style="zoom:80%;" />
-
+<h4 id="Mysql底层结构示意图"><a href="#Mysql底层结构示意图" class="headerlink" title="Mysql底层结构示意图"></a>Mysql底层结构示意图</h4><p><img src="https://p.ipic.vip/q9g5dg.png" alt="image-20250518112726769"></p>
 <h3 id="DoublewriteBuffer原理"><a href="#DoublewriteBuffer原理" class="headerlink" title="DoublewriteBuffer原理"></a><strong>DoublewriteBuffer原理</strong></h3><p>在purge操作之前，Mysql会先把数据写到另外一个地方 DoubleWrite Buffer，写完后再开始写磁盘；Doublewrite Buffer是一个备份，当发生 crash时可以利用它来修复磁盘数据。</p>
 <ul>
 <li>刷数据之前宕机：内存—&gt; 磁盘，重做 redo log日志。</li>
