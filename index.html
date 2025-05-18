@@ -298,22 +298,6 @@
 <li><p>key：实际使用的索引</p>
 </li>
 <li><p>rows：扫描的行数  </p>
-</li>
-<li><p>type：索引查询类型，经常用到的索引查询类型</p>
-<ul>
-<li><p>const：使用 <strong>主键或 唯一索引</strong>进行查询时，只有一行匹配</p>
-</li>
-<li><p>**ref：使用 <strong>非唯一索引</strong></p>
-</li>
-<li><p>range：使用“主键”、单个字段的辅助索引、多个字段的辅助索引的最后一个字段进行范围查询</p>
-</li>
-<li><p>all：扫描全表</p>
-</li>
-<li><p>index：和 all 区别：只扫描索引树，查询字段是索引的一部分，使用主键进行排序</p>
-</li>
-</ul>
-</li>
-</ul>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2025/05/18/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/#more" rel="contents">
@@ -405,8 +389,6 @@
     <div class="post-body" itemprop="articleBody">
           <h3 id="BufferPool原理"><a href="#BufferPool原理" class="headerlink" title="BufferPool原理"></a><strong>BufferPool原理</strong></h3><p><strong>原理：</strong>对于数据的修改，Mysql不会直接去修改磁盘数据，这样做太慢了，Mysql会先记录 redo log，再改内存BufferPool，等空闲时再刷磁盘，查询时如果内存 BufferPool里没有数据就去磁盘 load；</p>
 <p>Mysql以16KB「页」为读取和写入单位，一「页」里有多行数据，写数据时，Mysql会先写内存中的页，然后再刷新到磁盘。</p>
-<p><strong>结构：</strong>BufferPool是以页(16kb)为元素的链表结构，基于LRU，和缓存一样，需要淘汰算法来管理数据；</p>
-<p><strong>持久化：</strong> 宕机时，BufferPool会丢失数据（在内存中），需要重做 redo log； 执行时先写redo log, 再写BufferPool。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2025/05/11/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/#more" rel="contents">
