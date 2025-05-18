@@ -186,13 +186,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -225,6 +225,97 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/05/20/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E4%BC%98%E5%8C%96%E5%AE%9E%E8%B7%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar/avatar.jpg">
+      <meta itemprop="name" content="TurboCome">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TurboCome">
+      <meta itemprop="description" content="学而不思则罔，思而不学则殆！">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | TurboCome">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2025/05/20/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E4%BC%98%E5%8C%96%E5%AE%9E%E8%B7%B5/" class="post-title-link" itemprop="url">Mysql优化实践</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-05-20 22:14:43" itemprop="dateCreated datePublished" datetime="2025-05-20T22:14:43+08:00">2025-05-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Mysql/%E4%BC%98%E5%8C%96/" itemprop="url" rel="index"><span itemprop="name">优化</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+          
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="1-Mysql更新大量数据"><a href="#1-Mysql更新大量数据" class="headerlink" title="1.Mysql更新大量数据"></a><strong>1.Mysql更新大量数据</strong></h3><h4 id="问题点：主从延迟数据不一致"><a href="#问题点：主从延迟数据不一致" class="headerlink" title="问题点：主从延迟数据不一致"></a>问题点：主从延迟数据不一致</h4><p>一个SQL 只能使用一个cpu core去处理，如果SQL很复杂或执行很慢，会<strong>阻塞后面的 SQL请求，</strong>造成Mysql活动连接数暴增，MySQL CPU100%，相关业务<strong>接口Timeout。</strong></p>
+<p>同时对于 主从复制架构，做了业务读写分离，更新500w数据需要5分钟，Master上执行5分钟，binlog传到slave也需要执行5分钟，Slave节点就会延迟5分钟，在这期间会造成业务脏数据，比如重复下单等问题。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/05/20/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E4%BC%98%E5%8C%96%E5%AE%9E%E8%B7%B5/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
