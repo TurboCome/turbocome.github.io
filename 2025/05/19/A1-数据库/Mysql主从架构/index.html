@@ -19,30 +19,31 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="BufferPool原理原理：对于数据的修改，Mysql不会直接去修改磁盘数据，这样做太慢了，Mysql会先记录 redo log，再改内存BufferPool，等空闲时再刷磁盘，查询时如果内存 BufferPool里没有数据就去磁盘 load； Mysql以16KB「页」为读取和写入单位，一「页」里有多行数据，写数据时，Mysql会先写内存中的页，然后再刷新到磁盘。">
+    <meta name="description" content="主从复制异步过程1.Mysql主库在收到客户端提交事务的请求后，先写bin log，然后再提交事务，更新数据； 2.事务提交完成后，给客户端返回操作成功的响应。此时从库会启动一个复制 IO线程，从主库接收 binlog； 3.把binlog 写到一个中继日志里，再给主库返回一个复制成功的响应； 4.从库有一个 SQL线程，去读中继日志，回放 binlog内容，以此实现数据的同步；">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Mysql底层原理">
-<meta property="og:url" content="http://example.com/2025/05/11/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:title" content="Mysql主从架构">
+<meta property="og:url" content="http://example.com/2025/05/19/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E4%B8%BB%E4%BB%8E%E6%9E%B6%E6%9E%84/index.html">
 <meta property="og:site_name" content="TurboCome">
-<meta property="og:description" content="BufferPool原理原理：对于数据的修改，Mysql不会直接去修改磁盘数据，这样做太慢了，Mysql会先记录 redo log，再改内存BufferPool，等空闲时再刷磁盘，查询时如果内存 BufferPool里没有数据就去磁盘 load； Mysql以16KB「页」为读取和写入单位，一「页」里有多行数据，写数据时，Mysql会先写内存中的页，然后再刷新到磁盘。">
+<meta property="og:description" content="主从复制异步过程1.Mysql主库在收到客户端提交事务的请求后，先写bin log，然后再提交事务，更新数据； 2.事务提交完成后，给客户端返回操作成功的响应。此时从库会启动一个复制 IO线程，从主库接收 binlog； 3.把binlog 写到一个中继日志里，再给主库返回一个复制成功的响应； 4.从库有一个 SQL线程，去读中继日志，回放 binlog内容，以此实现数据的同步；">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://p.ipic.vip/iqax6b.png">
-<meta property="og:image" content="https://p.ipic.vip/q9g5dg.png">
-<meta property="article:published_time" content="2025-05-11T11:14:43.000Z">
-<meta property="article:modified_time" content="2025-05-18T08:04:57.402Z">
+<meta property="og:image" content="https://p.ipic.vip/jm71qa.png">
+<meta property="og:image" content="https://p.ipic.vip/4gjrda.png">
+<meta property="og:image" content="https://p.ipic.vip/3nniqg.png">
+<meta property="article:published_time" content="2025-05-19T11:14:43.000Z">
+<meta property="article:modified_time" content="2025-05-18T08:42:44.399Z">
 <meta property="article:author" content="TurboCome">
 <meta property="article:tag" content="Mysql">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://p.ipic.vip/iqax6b.png">
+<meta name="twitter:image" content="https://p.ipic.vip/jm71qa.png">
 
 
-<link rel="canonical" href="http://example.com/2025/05/11/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/">
+<link rel="canonical" href="http://example.com/2025/05/19/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E4%B8%BB%E4%BB%8E%E6%9E%B6%E6%9E%84/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/05/11/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/","path":"2025/05/11/A1-数据库/Mysql底层原理/","title":"Mysql底层原理"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/05/19/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E4%B8%BB%E4%BB%8E%E6%9E%B6%E6%9E%84/","path":"2025/05/19/A1-数据库/Mysql主从架构/","title":"Mysql主从架构"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Mysql底层原理 | TurboCome</title>
+<title>Mysql主从架构 | TurboCome</title>
   
 
   <script src="/js/third-party/analytics/baidu-analytics.js" defer></script>
@@ -178,7 +179,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#BufferPool%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">BufferPool原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ChangeBuffer%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">ChangeBuffer原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">2.1.</span> <span class="nav-text">使用场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Flush-purge%E8%BF%87%E7%A8%8B"><span class="nav-number">2.2.</span> <span class="nav-text">Flush &lt;–&gt; purge过程</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%A7%A6%E5%8F%91%E6%9D%A1%E4%BB%B6%EF%BC%9A"><span class="nav-number">2.2.1.</span> <span class="nav-text">触发条件：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Merge%E8%A7%A6%E5%8F%91%E6%9D%A1%E4%BB%B6"><span class="nav-number">2.2.2.</span> <span class="nav-text">Merge触发条件</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Mysql%E5%BA%95%E5%B1%82%E7%BB%93%E6%9E%84%E7%A4%BA%E6%84%8F%E5%9B%BE"><span class="nav-number">2.3.</span> <span class="nav-text">Mysql底层结构示意图</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DoublewriteBuffer%E5%8E%9F%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">DoublewriteBuffer原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mysql%E4%B8%AD%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8"><span class="nav-number">4.</span> <span class="nav-text">Mysql中数据存储</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%BC%82%E6%AD%A5%E8%BF%87%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">主从复制异步过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="nav-number">1.1.</span> <span class="nav-text">总结：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mysql%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">Mysql主从复制类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E5%BC%82%E6%AD%A5%E5%A4%8D%E5%88%B6"><span class="nav-number">2.1.</span> <span class="nav-text">1.异步复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6"><span class="nav-number">2.2.</span> <span class="nav-text">2.半同步复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%A2%9E%E5%BC%BA%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6"><span class="nav-number">2.3.</span> <span class="nav-text">3.增强半同步复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E5%85%A8%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6"><span class="nav-number">2.4.</span> <span class="nav-text">4.全同步复制</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%8A%E5%90%8C%E6%AD%A5-%E5%A2%9E%E5%BC%BA%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%8C%BA%E5%88%AB"><span class="nav-number">3.</span> <span class="nav-text">半同步&amp;增强半同步区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB"><span class="nav-number">4.</span> <span class="nav-text">读写分离</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E6%8F%90%E9%AB%98%E6%80%A7%E8%83%BD%E5%8E%9F%E5%9B%A0"><span class="nav-number">4.1.</span> <span class="nav-text">读写分离提高性能原因</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E6%9C%BA%E5%AE%95%E6%9C%BA%E6%81%A2%E5%A4%8D%E6%9C%BA%E5%88%B6"><span class="nav-number">5.</span> <span class="nav-text">主机宕机恢复机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Mysql%E9%9B%86%E7%BE%A4%E9%85%8D%E7%BD%AE"><span class="nav-number">5.1.</span> <span class="nav-text">Mysql集群配置</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -242,7 +243,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2025/05/11/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/05/19/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E4%B8%BB%E4%BB%8E%E6%9E%B6%E6%9E%84/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar/avatar.jpg">
@@ -255,12 +256,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="Mysql底层原理 | TurboCome">
+      <meta itemprop="name" content="Mysql主从架构 | TurboCome">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Mysql底层原理
+          Mysql主从架构
         </h1>
 
         <div class="post-meta-container">
@@ -271,7 +272,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2025-05-11 19:14:43" itemprop="dateCreated datePublished" datetime="2025-05-11T19:14:43+08:00">2025-05-11</time>
+      <time title="创建时间：2025-05-19 19:14:43" itemprop="dateCreated datePublished" datetime="2025-05-19T19:14:43+08:00">2025-05-19</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -283,7 +284,7 @@
         </span>
           ，
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Mysql/%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/" itemprop="url" rel="index"><span itemprop="name">底层原理</span></a>
+          <a href="/categories/Mysql/%E4%B8%BB%E4%BB%8E%E6%9E%B6%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">主从架构</span></a>
         </span>
     </span>
 
@@ -304,42 +305,48 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h3 id="BufferPool原理"><a href="#BufferPool原理" class="headerlink" title="BufferPool原理"></a><strong>BufferPool原理</strong></h3><p><strong>原理：</strong>对于数据的修改，Mysql不会直接去修改磁盘数据，这样做太慢了，Mysql会先记录 redo log，再改内存BufferPool，等空闲时再刷磁盘，查询时如果内存 BufferPool里没有数据就去磁盘 load；</p>
-<p>Mysql以16KB「页」为读取和写入单位，一「页」里有多行数据，写数据时，Mysql会先写内存中的页，然后再刷新到磁盘。</p>
+    <div class="post-body" itemprop="articleBody"><h3 id="主从复制异步过程"><a href="#主从复制异步过程" class="headerlink" title="主从复制异步过程"></a>主从复制异步过程</h3><p>1.Mysql主库在收到客户端提交事务的请求后，先写bin log，然后再提交事务，更新数据；</p>
+<p>2.事务提交完成后，给客户端返回操作成功的响应。此时从库会启动一个复制 IO线程，从主库接收 binlog；</p>
+<p>3.把binlog 写到一个中继日志里，再给主库返回一个复制成功的响应；</p>
+<p>4.从库有一个 SQL线程，去读中继日志，回放 binlog内容，以此实现数据的同步； </p>
 <span id="more"></span>
 
-<p><strong>结构：</strong>BufferPool是以页(16kb)为元素的链表结构，基于LRU，和缓存一样，需要淘汰算法来管理数据；</p>
-<p><strong>持久化：</strong> 宕机时，BufferPool会丢失数据（在内存中），需要重做 redo log； 执行时先写redo log, 再写BufferPool。</p>
-<img src="https://p.ipic.vip/iqax6b.png" alt="image-20250511225327165" style="zoom:30%;" />
+<h4 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h4><p>异步复制时：主库提交事务之后，就会给客户端返回响应。</p>
+<p>同步复制时：主库在提交事务时，会等待数据复制到所有从库之后，再给客户端返回响应。</p>
+<p><img src="https://p.ipic.vip/jm71qa.png" alt="image-20250518163722159"></p>
+<h3 id="Mysql主从复制类型"><a href="#Mysql主从复制类型" class="headerlink" title="Mysql主从复制类型"></a>Mysql主从复制类型</h3><h4 id="1-异步复制"><a href="#1-异步复制" class="headerlink" title="1.异步复制"></a><strong>1.异步复制</strong></h4><p>主库执行完提交的事务后，立即将结果返给客户端，并不关心从库是否已经接收并处理。如果主宕机了，此时主上已经提交的事务可能并没有传到从库上，此时强行将从库提升为主库，就可能导致新主上的数据不完整。</p>
+<h4 id="2-半同步复制"><a href="#2-半同步复制" class="headerlink" title="2.半同步复制"></a><strong>2.半同步复制</strong></h4><p>主库执行完客户端提交的事务后，不会立刻返回给客户端，而是等待 <strong>至少一个从库接收到bin log日志后才返回给客户端</strong>。半同步复制提高了数据的安全性，同时也造成了一定程度的延迟，这个延迟最少是一个TCP&#x2F;IP往返的时间，所以，半同步复制最好在低延时的网络中使用。</p>
+<h4 id="3-增强半同步复制"><a href="#3-增强半同步复制" class="headerlink" title="3.增强半同步复制"></a>3.增强半同步复制</h4><p>增强半同步复制，是mysql 5.7.2后的版本，对半同步复制做的一个改进，原理上几乎是一样的，主要解决幻读的问题。主库在存储引擎 <strong>提交事务前，必须先收到从库数据同步完成的确认信息</strong>，才能提交事务，以此来解决幻读问题。</p>
+<h4 id="4-全同步复制"><a href="#4-全同步复制" class="headerlink" title="4.全同步复制"></a><strong>4.全同步复制</strong></h4><p>当主库执行完一个事务，所有从库都执行该事务后，主库才返回给客户端。需要等待所有从库执行完该事务，才能返回，全同步复制的性能必然会受到严重的影响。</p>
+<h3 id="半同步-增强半同步区别"><a href="#半同步-增强半同步区别" class="headerlink" title="半同步&amp;增强半同步区别"></a>半同步&amp;增强半同步区别</h3><p><strong>半同步：</strong>等待ACK的点是Commit之后，此时Master已经完成数据变更，用户已经可以看到最新数据，但binlog还未同步到Slave时，发生主从切换后，此时从库是没有这个最新数据的，用户看到的是老数据。</p>
+<p><strong>增强半同步：</strong>将等待ACK的点放在提交Commit之前，此时数据还未被提交，外界看不到数据变更，此时如果发送主从切换，新库依然还是老数据，不存在数据不一致的问题。</p>
+<p>总结：等待slave 已经同步完数据，再做commit提交！主库提交事务的时间点是有差别的。</p>
+<img src="https://p.ipic.vip/4gjrda.png" alt="img"  />
 
-<h3 id="ChangeBuffer原理"><a href="#ChangeBuffer原理" class="headerlink" title="ChangeBuffer原理"></a><strong>ChangeBuffer原理</strong></h3><p><strong>背景：</strong>Mysql查询数据时，如果内存里没有对应页的数据，会从磁盘里load；如果每次需要的页都不同（不是相邻的页），那每次都要去 load，效率会降低；</p>
-<p><strong>原理：</strong>更新一个数据页时，如果数据页在内存中，就直接更新；但如果这个数据页没在内存中，InooDB会将这些更新操作缓存在 <strong>change buffer中</strong>，这样就不需要从磁盘读入这个数据页。在下次<strong>查询需要</strong>访问这个数据页时，再将数据页读入内存，执行change buffer中与这个页有关的操作，通过这种方式就能保证数据逻辑的正确性。</p>
-<p><strong>使用条件：</strong>普通索引可以使用 Changebuffer，唯一索引（或主键）更新不能使用 change buffer，因为唯一索引更新操作要先判断这个操作 <strong>是否违反唯一性约束，</strong>判断表中是否存在这个数据，就必须要将数据页读入内存才能判断，已经读到内存中，直接更新内存会更快，就没必要使用change buffer。</p>
-<p><strong>关系：</strong>change buffer 是 buffer pool里的内存，不能无限增大；</p>
-<h4 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a><strong>使用场景</strong></h4><p><strong>适合：写多读少业务，</strong>在写完后马上被访问到的概率比较小，此时change buffer使用效果最好，业务模型常见：账单类，日志类的系统。</p>
-<p><strong>不适合：读多写少（写入后马上会做查询</strong>）将更新先记录在change buffer，但由于马上要访问这个数据页，会立即触发merge操作，访问IO次数不会减少，反而增加 change buffer维护代价。</p>
-<p>优劣：数据库进行 Merge 时，是真正进行 <strong>数据更新的时刻，</strong>change buffer目的就是将记录的变更动作缓存下来，所以在一个数据页做merge前，change buffer 记录变更数越多（页面要更新的数据越多），收益就越大。</p>
-<p>merge：ChangeBuffer –&gt; BufferPool</p>
-<p>purge（刷脏）: BufferPool –&gt; disk</p>
-<p><strong>脏页：</strong>在更新之前，当内存数据页跟磁盘数据页内容不一致的时候</p>
-<h4 id="Flush-purge过程"><a href="#Flush-purge过程" class="headerlink" title="Flush &lt;–&gt; purge过程"></a>Flush &lt;–&gt; purge过程</h4><p>将内存缓冲区BufferPool中的脏页写入磁盘，保障事务持久性</p>
-<h5 id="触发条件："><a href="#触发条件：" class="headerlink" title="触发条件："></a>触发条件：</h5><ul>
-<li>缓存池脏页比例超过阈值</li>
-<li>事务提交</li>
-<li>MySQL正常关闭，会把内存中的脏页都flush到磁盘上</li>
+
+
+<h3 id="读写分离"><a href="#读写分离" class="headerlink" title="读写分离"></a>读写分离</h3><ul>
+<li>主服务器：写 +  读 （实时性要求高） </li>
+<li>从服务器：读</li>
 </ul>
-<h5 id="Merge触发条件"><a href="#Merge触发条件" class="headerlink" title="Merge触发条件"></a>Merge触发条件</h5><ul>
-<li>访问这个数据页</li>
-<li>系统后台线程定期 merge</li>
-<li>数据库正常关闭（shutdown）过程中会执行merge</li>
-</ul>
-<h4 id="Mysql底层结构示意图"><a href="#Mysql底层结构示意图" class="headerlink" title="Mysql底层结构示意图"></a>Mysql底层结构示意图</h4><p><img src="https://p.ipic.vip/q9g5dg.png" alt="image-20250518112726769"></p>
-<h3 id="DoublewriteBuffer原理"><a href="#DoublewriteBuffer原理" class="headerlink" title="DoublewriteBuffer原理"></a><strong>DoublewriteBuffer原理</strong></h3><p>在purge操作之前，Mysql会先把数据写到另外一个地方 DoubleWrite Buffer，写完后再开始写磁盘；Doublewrite Buffer是一个备份，当发生 crash时可以利用它来修复磁盘数据。</p>
-<ul>
-<li>刷数据之前宕机：内存—&gt; 磁盘，重做 redo log日志。</li>
-<li>刷数据时宕机：利用Doublewrite Buffer修复磁盘数据。</li>
-</ul>
-<h3 id="Mysql中数据存储"><a href="#Mysql中数据存储" class="headerlink" title="Mysql中数据存储"></a><strong>Mysql中数据存储</strong></h3><p>各个“数据页(16K)”组成一个 双向链表，每个 数据页中的记录又组成一个 单向链表。每个数据页都会为存储记录 生成<strong>页目录</strong>，一个数据页内：主键查找，二分法快速定位 ； 其他非主键列查找，从最小记录开始依次遍历单链表。</p>
+<h4 id="读写分离提高性能原因"><a href="#读写分离提高性能原因" class="headerlink" title="读写分离提高性能原因"></a>读写分离提高性能原因</h4><p>1.主从服务器负责各自的 读和写，缓解了锁的竞争；</p>
+<p>2.从服务器可以使用 Myisam引擎，提升查询性能，以及节约系统开销；</p>
+<h3 id="主机宕机恢复机制"><a href="#主机宕机恢复机制" class="headerlink" title="主机宕机恢复机制"></a><strong>主机宕机恢复机制</strong></h3><p>1.确保所有从节点 <strong>relay log全部更新完毕（</strong>数据都已同步完），在每个从库上执行 show processlist 查看。</p>
+<p>2.登录所有从节点，查看 master.info文件， 找<strong>最大的  pos节点作为新主库，数据最全。</strong></p>
+<p>3.登录 pos最大从节点，执行 stop slave，<strong>删</strong> <strong>relay-log.info</strong> <strong>等相关文件，</strong>开启 bin-log来记录sql 日志；执行 reset master。</p>
+<p>4.创建用于<strong>同步的用户，并授权slave。</strong></p>
+<p>5.登录其他从节点，执行 stop slave停止同步，再<strong>执行 start slave。</strong></p>
+<p>6.测试 新master 和 slave 数据是否同步。</p>
+<p>参考：<a target="_blank" rel="noopener" href="https://zq99299.github.io/note-book/back-end-storage/02/06.html#%E5%A6%82%E4%BD%95%E9%85%8D%E7%BD%AE-mysql-%E7%9A%84%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5">MySQL主从同步参考</a></p>
+<h4 id="Mysql集群配置"><a href="#Mysql集群配置" class="headerlink" title="Mysql集群配置"></a>Mysql集群配置</h4><p>单库性能极限：1W TPS</p>
+<p>100库性能极限：100W TPS</p>
+<p>实际Mysql集群部署情况：1主5从双机房，单机房3个实例，在大型互联网公司会以这种集群部署方式来部署Mysql集群。</p>
+<img src="https://p.ipic.vip/3nniqg.png" alt="image-20250518164016734" style="zoom:50%;" />
+
+
+
+
+
 
     </div>
 
@@ -356,14 +363,11 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2025/05/05/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E4%BA%8B%E5%8A%A1/" rel="prev" title="Mysql事务">
-                  <i class="fa fa-angle-left"></i> Mysql事务
+                <a href="/2025/05/18/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/" rel="prev" title="Mysql查询优化">
+                  <i class="fa fa-angle-left"></i> Mysql查询优化
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2025/05/18/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/" rel="next" title="Mysql查询优化">
-                  Mysql查询优化 <i class="fa fa-angle-right"></i>
-                </a>
             </div>
           </div>
     </footer>
