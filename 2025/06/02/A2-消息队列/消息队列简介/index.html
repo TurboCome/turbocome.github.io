@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Kafka消息队列结构队列topic多个生产者往同一个队列 topic丢数据，多个消费者往同一个队列(topic)拿数据。 队列分区Partition为提高一个队列topic吞吐量，Kafka把topic进行分区 Partition，生产者往一个发布订阅的topic分区 Partition中发数据，消费者从分区Partition中取数据。每个Topic 可以有多个分区，分区是最小的读取和存储结构。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kafka消息队列">
+<meta property="og:url" content="http://example.com/2025/06/02/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%AE%80%E4%BB%8B/index.html">
+<meta property="og:site_name" content="TurboCome">
+<meta property="og:description" content="Kafka消息队列结构队列topic多个生产者往同一个队列 topic丢数据，多个消费者往同一个队列(topic)拿数据。 队列分区Partition为提高一个队列topic吞吐量，Kafka把topic进行分区 Partition，生产者往一个发布订阅的topic分区 Partition中发数据，消费者从分区Partition中取数据。每个Topic 可以有多个分区，分区是最小的读取和存储结构。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://p.ipic.vip/01weyx.png">
+<meta property="og:image" content="https://p.ipic.vip/roacp3.png">
+<meta property="og:image" content="https://p.ipic.vip/5jir76.png">
+<meta property="og:image" content="https://p.ipic.vip/nfo36l.png">
+<meta property="og:image" content="https://zjxdj6vnpk.feishu.cn/space/api/box/stream/download/asynccode/?code=NTc4MzZiOGM1NGVhMWU3YzE3YzAwODYxODNiM2M1NDNfRGZoY0F2MGdjTmZrdG9ZVE9KdzB1WVl2c1NyOWJ2eHFfVG9rZW46RUtONWJrWDZab1BnNU14Z3FhTGNQcGFrbklsXzE3NDg4NjY4NzU6MTc0ODg3MDQ3NV9WNA">
+<meta property="og:image" content="https://p.ipic.vip/ijkfdq.png">
+<meta property="article:published_time" content="2025-06-02T12:14:43.000Z">
+<meta property="article:modified_time" content="2025-06-02T12:34:22.619Z">
+<meta property="article:author" content="TurboCome">
+<meta property="article:tag" content="消息队列MQ">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://p.ipic.vip/01weyx.png">
+
+
+<link rel="canonical" href="http://example.com/2025/06/02/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%AE%80%E4%BB%8B/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/06/02/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%AE%80%E4%BB%8B/","path":"2025/06/02/A2-消息队列/消息队列简介/","title":"Kafka消息队列"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Kafka消息队列 | TurboCome</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js" defer></script>
+  <script async src="https://hm.baidu.com/hm.js?dbd38ecdd37e06f1e9b027fc0fbc8e2e"></script>
+
+
+
+
+
+
+
+  
+  <script size="" alpha="" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/src/fireworks.js"></script>
+
+
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">TurboCome</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">淡泊明志，宁静致远！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%BB%93%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">Kafka消息队列结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%9F%E5%88%97topic"><span class="nav-number">1.1.</span> <span class="nav-text">队列topic</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%9F%E5%88%97%E5%88%86%E5%8C%BAPartition"><span class="nav-number">1.2.</span> <span class="nav-text">队列分区Partition</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%8C%BAPartition"><span class="nav-number">1.3.</span> <span class="nav-text">分区Partition</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%8F%91%E5%BE%80%E5%93%AA%E4%B8%AApartition%EF%BC%9F"><span class="nav-number">1.4.</span> <span class="nav-text">数据发往哪个partition？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91%E7%B2%92%E5%BA%A6partition"><span class="nav-number">1.5.</span> <span class="nav-text">并发粒度partition</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8Broker"><span class="nav-number">1.6.</span> <span class="nav-text">服务器Broker</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Broker%E5%89%AF%E6%9C%AC%EF%BC%88Replica%EF%BC%89"><span class="nav-number">1.6.1.</span> <span class="nav-text">Broker副本（Replica）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE%E7%AD%96%E7%95%A5"><span class="nav-number">1.7.</span> <span class="nav-text">删除数据策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B6%88%E6%81%AF%E8%BD%AE%E8%AF%A2"><span class="nav-number">1.8.</span> <span class="nav-text">消息轮询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E6%96%B0%E5%88%86%E5%8C%BA%E5%88%86%E9%85%8D"><span class="nav-number">1.9.</span> <span class="nav-text">重新分区分配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B6%88%E6%81%AF%E6%8C%81%E4%B9%85%E5%8C%96"><span class="nav-number">1.10.</span> <span class="nav-text">消息持久化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B6%88%E6%81%AF%E9%A1%BA%E5%BA%8F%E6%80%A7"><span class="nav-number">1.11.</span> <span class="nav-text">消息顺序性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B6%88%E6%81%AF%E4%B8%8D%E4%B8%A2%E5%A4%B1"><span class="nav-number">1.12.</span> <span class="nav-text">消息不丢失</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E7%94%9F%E4%BA%A7%E8%80%85ack"><span class="nav-number">1.12.1.</span> <span class="nav-text">1.生产者ack</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E9%98%9F%E5%88%97%E8%AE%BE%E7%BD%AE%EF%BC%88%E5%89%AF%E6%9C%AC-%E6%8C%81%E4%B9%85%E5%8C%96%EF%BC%89"><span class="nav-number">1.12.2.</span> <span class="nav-text">2.队列设置（副本&#x2F;持久化）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E6%B6%88%E8%B4%B9%E8%80%85ack"><span class="nav-number">1.12.3.</span> <span class="nav-text">3.消费者ack</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="TurboCome"
+      src="/images/avatar/avatar.jpg">
+  <p class="site-author-name" itemprop="name">TurboCome</p>
+  <div class="site-description" itemprop="description">学而不思则罔，思而不学则殆！</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/TurboCome" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;TurboCome" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:turbocome@gmail.com" title="E-Mail → mailto:turbocome@gmail.com" rel="noopener me" target="_blank"><i class="fab fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/6161857964" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;6161857964" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/06/02/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%AE%80%E4%BB%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar/avatar.jpg">
+      <meta itemprop="name" content="TurboCome">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TurboCome">
+      <meta itemprop="description" content="学而不思则罔，思而不学则殆！">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Kafka消息队列 | TurboCome">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Kafka消息队列
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-06-02 20:14:43" itemprop="dateCreated datePublished" datetime="2025-06-02T20:14:43+08:00">2025-06-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97MQ/" itemprop="url" rel="index"><span itemprop="name">消息队列MQ</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+          
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="Kafka消息队列结构"><a href="#Kafka消息队列结构" class="headerlink" title="Kafka消息队列结构"></a>Kafka消息队列结构</h2><h3 id="队列topic"><a href="#队列topic" class="headerlink" title="队列topic"></a>队列topic</h3><p>多个生产者往同一个队列 topic<strong>丢数据，多个消费者</strong>往同一个队列(topic)拿数据。</p>
+<h3 id="队列分区Partition"><a href="#队列分区Partition" class="headerlink" title="队列分区Partition"></a>队列分区Partition</h3><p>为提高一个队列topic<strong>吞吐量</strong>，Kafka把topic进行分区 <strong>Partition</strong>，生产者往一个发布订阅的topic分区 <strong>Partition中发</strong>数据，消费者从分区<strong>Partition</strong>中取数据。<strong>每个Topic 可以有多个</strong>分区，分区是最小的读取和存储结构。</p>
+<span id="more"></span>
+
+<img src="https://p.ipic.vip/01weyx.png" alt="image-20250602194721738" style="zoom: 67%;" />
+
+<h3 id="分区Partition"><a href="#分区Partition" class="headerlink" title="分区Partition"></a>分区Partition</h3><p>每个 Partition都是一个文件，收到消息后 Kafka会把数据插入到文件末尾。</p>
+<p><strong>缺点：</strong>没办法删除数据，所以 Kafka 是不会删除数据的，它会把所有的数据都保留下来，每个消费者对每个 Topic都有一个 offset 用来表示读取到第几条数据， offset 是由对应的消费者维护，保存到 Zookeeper 里面。 </p>
+<img src="https://p.ipic.vip/roacp3.png" alt="img" style="zoom:50%;" />
+
+<h3 id="数据发往哪个partition？"><a href="#数据发往哪个partition？" class="headerlink" title="数据发往哪个partition？"></a><strong>数据发往哪个partition？</strong></h3><ul>
+<li>发送时可以指定 partition，如果有指定，则写入对应的 partition；</li>
+<li>没有指定partition，但设置了数据key，则会根据key的值 hash出一个partition；</li>
+<li>没有指定 partition，也没有指定 key ， 会随机选择一个分区，并尽可能一直使用该分区，待该分区已满或过了间隔时间，再随机一个分区进行使用；</li>
+</ul>
+<h3 id="并发粒度partition"><a href="#并发粒度partition" class="headerlink" title="并发粒度partition"></a>并发粒度partition</h3><p>每个partition对应一个消费者，多个消费者同时进行消费，以此来提高并发量。消息是发往一个主题下的某个分区中。</p>
+<p>每个消费组会有自己的 offset（消费点位）来标识消费到的位置， 在消费点位之前表明已经消费过。 offset是分区级别，每个消费组都会维护订阅的 Topic下的每个分区的offset。offset 表示消费者的消费进度，每次消费者消费时都会提交这个offset。</p>
+<p>一个消费者组中的某个消费者挂了，但其所在分区可能有存活的消费者，<strong>存活的消费者继续去消费，但需要知道挂掉的消费者具体消费到了哪里</strong>，就需要知道offset。</p>
+<h3 id="服务器Broker"><a href="#服务器Broker" class="headerlink" title="服务器Broker"></a>服务器Broker</h3><p>Kafka服务器叫 <strong>Broker，</strong>集群是由多个broker组成。</p>
+<p>一个Topic分为多个partition，这些partition是<strong>分布</strong>在不同broker中，<strong>实现多机均匀负载。</strong>如果其中一台 broker挂了，会丢失其中 partition上的数据，但 kafka把这些 partition都做了<strong>备份。</strong>如现有三个partition，分别存在三台broker上，每个partition都会备份，这些备份散落在<strong>不同</strong>的broker上，如下图红色的 partition代表是<strong>主</strong>分区，紫色partition代表的是<strong>备份</strong>分区。</p>
+<p>生产者，消费者都是与<strong>主</strong>分区交互，<strong>备份分区仅用作于备份不做读写，</strong>如果某个Broker挂了，就会选举出其他 Broker的 partition来作为主分区，实现高可用。</p>
+<img src="https://p.ipic.vip/5jir76.png" alt="img" style="zoom:50%;" />
+
+<p>消费者都是属于某个消费组的，一条消息会发往多个订阅这个主题的消费组；例如：两个消费组分别是Group 1 和 Group 2，它们都订阅 Topic-a，此时有一条消息发往 Topic-a，那么这两个消费组都能接收到这条消息。这条消息实际 写入Topic中的某个分区，消费组中的某个消费者对应消费一个 Topic 的某个分区。</p>
+<img src="https://p.ipic.vip/nfo36l.png" alt="image-20250602200228360" style="zoom:50%;" />
+
+<h4 id="Broker副本（Replica）"><a href="#Broker副本（Replica）" class="headerlink" title="Broker副本（Replica）"></a>Broker副本（Replica）</h4><p>为更好的做 负载均衡，Kafka 尽量将所有的 Partition均匀分配到整个集群上。 </p>
+<p>为提高Kafka的容错能力，需要将同一个 Partition的 Replica尽量分散到不同的机器。 实际上，如果所有的 Replica都在同一个Broker上，那一旦该 Broker宕机，该 Partition所有 Replica都无法工作，也就达不到 备份的效果。 同时如果某个Broker宕机了，需要保证它上面的负载可以被均匀的分配到其它幸存的所有Broker上。 </p>
+<h3 id="删除数据策略"><a href="#删除数据策略" class="headerlink" title="删除数据策略"></a>删除数据策略</h3><p>目的：为避免磁盘被撑满，Kakfa 提供两种策略来删除数据</p>
+<ul>
+<li>基于时间 （默认七天）</li>
+<li>基于 Partition 文件大小</li>
+</ul>
+<h3 id="消息轮询"><a href="#消息轮询" class="headerlink" title="消息轮询"></a>消息轮询</h3><p>消费者组 是采用Pull 拉方式来消费消息，<strong>消费者通过轮询 API(poll) 向服务器定时请求数据。</strong></p>
+<h3 id="重新分区分配"><a href="#重新分区分配" class="headerlink" title="重新分区分配"></a>重新分区分配</h3><p>Partition 可以水平无限扩展，随着 Partition扩容， Consumer消费 Partition也会重新分配，这里涉及到消息消费分配策略，在 Kafka内部存在两种默认的分区分配策略：Range 和RoundRobin，当以下事件发生时，Kafka将会进行一次分区分配。</p>
+<ul>
+<li>同一个Consumer Group内新增消费者；</li>
+<li>订阅的主题新增Partition；</li>
+<li>消费者离开当前所属Group，包括Shuts Down或Crashes；</li>
+</ul>
+<h3 id="消息持久化"><a href="#消息持久化" class="headerlink" title="消息持久化"></a>消息持久化</h3><p>Kafka将partition数据写在<strong>磁盘</strong>，是<strong>追加写入，</strong>避免随机 I&#x2F;O操作，寻址磁盘效率低。</p>
+<p>持久化时，partition会先<strong>缓存</strong>一部分, 放在page cache中，等到<strong>足够多数据量&#x2F;等待一定的时间后，</strong>再批量写入(flush)。 <strong>消费者实际上也是从partition中取</strong>数据。</p>
+<img src="https://zjxdj6vnpk.feishu.cn/space/api/box/stream/download/asynccode/?code=NTc4MzZiOGM1NGVhMWU3YzE3YzAwODYxODNiM2M1NDNfRGZoY0F2MGdjTmZrdG9ZVE9KdzB1WVl2c1NyOWJ2eHFfVG9rZW46RUtONWJrWDZab1BnNU14Z3FhTGNQcGFrbklsXzE3NDg4NjY4NzU6MTc0ODg3MDQ3NV9WNA" alt="img" style="zoom:50%;" />
+
+<p>生产者，消费者都可以有多个，多个消费者可以组成一个消费者组，如果一个消费者消费三个分区，消费者组就可以每个消费者去消费一个分区，消费者组中各个消费者并发消费，以此来提高吞吐量。</p>
+<img src="https://p.ipic.vip/ijkfdq.png" alt="img" style="zoom:50%;" />
+
+<p>如果消费者组中的某个消费者挂了，那么其中有一个消费者就要消费两个 partition；如果只有三个partition，而消费者组有4个消费者，那一个消费者会空闲。<strong>消费者组</strong>之间从逻辑上是<strong>独立</strong>的，如果多加入一个<strong>消费者组</strong>，无论是新增的消费者组，还是原本的消费者组，都能消费topic的全部数据。</p>
+<h3 id="消息顺序性"><a href="#消息顺序性" class="headerlink" title="消息顺序性"></a>消息顺序性</h3><p><strong>Kafka是分布式结构，</strong>往一个 topic中存数据，实际上是 往多个 broker的 partition中存储数据，将 partition以消息日志的方式存储起来，通过<strong>顺序访问IO和缓存，</strong>才真正把数据写到磁盘上。</p>
+<p>要保证全局有序只能写入一个partition；要保证消费有序则消费者也只能有一个。</p>
+<p>分布式无法避免 网络抖动&#x2F;机器宕机 等问题的发生，很有可能消费者A读取数据，没来得及消费就挂了，Zookeeper 发现消费者A挂了，让消费者B 去消费原本A的分区，等消费者A重连的时候，发现已经重复消费同一条数据了(或消费者超时等)。如果 业务上不允许重复消费，最好是让<strong>消费者在业务上做重复性校验。</strong></p>
+<h3 id="消息不丢失"><a href="#消息不丢失" class="headerlink" title="消息不丢失"></a><strong>消息不丢失</strong></h3><h4 id="1-生产者ack"><a href="#1-生产者ack" class="headerlink" title="1.生产者ack"></a>1.生产者ack</h4><p>Kafka 支持在生产者一侧进行 <strong>本地 buffer</strong>，累积到一定数量才发送，如果这里设置不当会丢消息。当设置为async，会大幅提升性能，因为生产者会在本地缓冲消息，并适时批量发送。</p>
+<p>如果对可靠性要求高，设置sync同步发送，Kafka 采用至少一次保证消息不会丢，但可能会重复传输。acks默认值即为1，代表消息被partitioin接收之后才算成功发送，也可以配置 acks &#x3D; all 代表所有副本都接收到该消息之后，才算真正成功发送。</p>
+<h4 id="2-队列设置（副本-持久化）"><a href="#2-队列设置（副本-持久化）" class="headerlink" title="2.队列设置（副本&#x2F;持久化）"></a>2.队列设置（副本&#x2F;持久化）</h4><p><strong>集群：</strong>一般会设置 replication.factor &gt;&#x3D; 3，这样就可以保证每个分区(partition) 至少有 3个副本，以确保消息队列的安全性。</p>
+<p><strong>单机：</strong>通过持久化到磁盘来保证消息不丢失。</p>
+<h4 id="3-消费者ack"><a href="#3-消费者ack" class="headerlink" title="3.消费者ack"></a>3.消费者ack</h4><p><strong>消费端是否异步ack设置：</strong>消息处理完成前提交offset，可能造成数据丢失；Consumer默认自动提交 offset(位移)，在后台提交位移前一定要保证消息被正常处理。 </p>
+<p>如果处理耗时很长，建议把逻辑放到另一个线程中去做，异步提交ack会提高消费者的响应速度，但容易造成消息丢失。为避免消息丢失，设置 enable.auto.commit&#x3D;false，关闭自动提交位移，在消息被完整处理后再手动提交位移。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97MQ/" rel="tag"># 消息队列MQ</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/05/25/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Kafka%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" rel="prev" title="消息队列简介">
+                  <i class="fa fa-angle-left"></i> 消息队列简介
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC82MDYyOS8zNzEwMA=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">TurboCome</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/TurboCome" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script src="/js/third-party/comments/livere.js" defer></script>
+
+</body>
+</html>
