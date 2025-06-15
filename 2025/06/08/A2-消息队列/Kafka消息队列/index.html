@@ -34,9 +34,9 @@
 <meta property="og:image" content="https://p.ipic.vip/vgfqmx.png">
 <meta property="og:image" content="https://p.ipic.vip/617xcp.png">
 <meta property="og:image" content="http://example.com/Library/Application%20Support/typora-user-images/image-20250615173055629.png">
-<meta property="og:image" content="http://example.com/Library/Application%20Support/typora-user-images/image-20250615173555374.png">
+<meta property="og:image" content="https://p.ipic.vip/75aoun.png">
 <meta property="article:published_time" content="2025-06-08T12:14:43.000Z">
-<meta property="article:modified_time" content="2025-06-15T09:39:14.661Z">
+<meta property="article:modified_time" content="2025-06-15T10:09:25.788Z">
 <meta property="article:author" content="TurboCome">
 <meta property="article:tag" content="消息队列MQ">
 <meta name="twitter:card" content="summary">
@@ -385,7 +385,7 @@
 <li><strong>基于线程池：</strong>避免为每个连接创建线程，连接完成后将业务处理交给线程池处理；</li>
 </ul>
 <p><strong>实现原理：</strong>Reactor模型将所有要处理的 IO 事件注册到一个中心 I&#x2F;O多路复用器上，同时主线程&#x2F;进程阻塞在多路复用器上，一旦有 I&#x2F;O 事件到来或准备就绪 (文件描述符或 socket 可读&#x2F;写)，多路复用器返回并将事先注册的相应 I&#x2F;O 事件分发到对应的处理器中。Reactor 利用事件驱动机制实现，应用程序需提供相应接口，并注册到Reactor上，如果相应事件发生，Reactor将主动调用应用程序注册的接口。</p>
-<img src="../../../../../Library/Application%20Support/typora-user-images/image-20250615173555374.png" alt="image-20250615173555374" style="zoom:50%;" />
+<img src="https://p.ipic.vip/75aoun.png" alt="image-20250615173555374" style="zoom:50%;" />
 
 <h4 id="Reactor模型主要分为三个角色"><a href="#Reactor模型主要分为三个角色" class="headerlink" title="Reactor模型主要分为三个角色"></a>Reactor模型主要分为三个角色</h4><ul>
 <li>Reactor：把 IO事件分配给对应的 handler处理</li>
