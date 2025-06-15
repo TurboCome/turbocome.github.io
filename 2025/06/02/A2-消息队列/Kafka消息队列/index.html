@@ -22,7 +22,7 @@
     <meta name="description" content="Kafka消息队列结构队列topic多个生产者往同一个队列 topic丢数据，多个消费者往同一个队列(topic)拿数据。 队列分区Partition为提高一个队列topic吞吐量，Kafka把topic进行分区 Partition，生产者往一个发布订阅的topic分区 Partition中发数据，消费者从分区Partition中取数据。每个Topic 可以有多个分区，分区是最小的读取和存储结构。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kafka消息队列">
-<meta property="og:url" content="http://example.com/2025/06/02/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%AE%80%E4%BB%8B/index.html">
+<meta property="og:url" content="http://example.com/2025/06/02/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Kafka%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/index.html">
 <meta property="og:site_name" content="TurboCome">
 <meta property="og:description" content="Kafka消息队列结构队列topic多个生产者往同一个队列 topic丢数据，多个消费者往同一个队列(topic)拿数据。 队列分区Partition为提高一个队列topic吞吐量，Kafka把topic进行分区 Partition，生产者往一个发布订阅的topic分区 Partition中发数据，消费者从分区Partition中取数据。每个Topic 可以有多个分区，分区是最小的读取和存储结构。">
 <meta property="og:locale" content="zh_CN">
@@ -30,20 +30,19 @@
 <meta property="og:image" content="https://p.ipic.vip/roacp3.png">
 <meta property="og:image" content="https://p.ipic.vip/5jir76.png">
 <meta property="og:image" content="https://p.ipic.vip/nfo36l.png">
-<meta property="og:image" content="https://zjxdj6vnpk.feishu.cn/space/api/box/stream/download/asynccode/?code=NTc4MzZiOGM1NGVhMWU3YzE3YzAwODYxODNiM2M1NDNfRGZoY0F2MGdjTmZrdG9ZVE9KdzB1WVl2c1NyOWJ2eHFfVG9rZW46RUtONWJrWDZab1BnNU14Z3FhTGNQcGFrbklsXzE3NDg4NjY4NzU6MTc0ODg3MDQ3NV9WNA">
 <meta property="og:image" content="https://p.ipic.vip/ijkfdq.png">
 <meta property="article:published_time" content="2025-06-02T12:14:43.000Z">
-<meta property="article:modified_time" content="2025-06-07T02:34:26.388Z">
+<meta property="article:modified_time" content="2025-06-15T10:19:22.458Z">
 <meta property="article:author" content="TurboCome">
 <meta property="article:tag" content="消息队列MQ">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://p.ipic.vip/01weyx.png">
 
 
-<link rel="canonical" href="http://example.com/2025/06/02/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%AE%80%E4%BB%8B/">
+<link rel="canonical" href="http://example.com/2025/06/02/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Kafka%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/06/02/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%AE%80%E4%BB%8B/","path":"2025/06/02/A2-消息队列/消息队列简介/","title":"Kafka消息队列"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/06/02/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Kafka%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/","path":"2025/06/02/A2-消息队列/Kafka消息队列/","title":"Kafka消息队列"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>Kafka消息队列 | TurboCome</title>
@@ -246,7 +245,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2025/06/02/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%AE%80%E4%BB%8B/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/06/02/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Kafka%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar/avatar.jpg">
@@ -343,8 +342,6 @@
 </ul>
 <h3 id="消息持久化"><a href="#消息持久化" class="headerlink" title="消息持久化"></a>消息持久化</h3><p>Kafka将partition数据写在<strong>磁盘</strong>，是<strong>追加写入，</strong>避免随机 I&#x2F;O操作，寻址磁盘效率低。</p>
 <p>持久化时，partition会先<strong>缓存</strong>一部分, 放在page cache中，等到<strong>足够多数据量&#x2F;等待一定的时间后，</strong>再批量写入(flush)。 <strong>消费者实际上也是从partition中取</strong>数据。</p>
-<img src="https://zjxdj6vnpk.feishu.cn/space/api/box/stream/download/asynccode/?code=NTc4MzZiOGM1NGVhMWU3YzE3YzAwODYxODNiM2M1NDNfRGZoY0F2MGdjTmZrdG9ZVE9KdzB1WVl2c1NyOWJ2eHFfVG9rZW46RUtONWJrWDZab1BnNU14Z3FhTGNQcGFrbklsXzE3NDg4NjY4NzU6MTc0ODg3MDQ3NV9WNA" alt="img" style="zoom:50%;" />
-
 <p>生产者，消费者都可以有多个，多个消费者可以组成一个消费者组，如果一个消费者消费三个分区，消费者组就可以每个消费者去消费一个分区，消费者组中各个消费者并发消费，以此来提高吞吐量。</p>
 <p>如果消费者组中的某个消费者挂了，那么其中有一个消费者就要消费两个 partition；如果只有三个partition，而消费者组有4个消费者，那一个消费者会空闲。<strong>消费者组</strong>之间从逻辑上是<strong>独立</strong>的，如果多加入一个<strong>消费者组</strong>，无论是新增的消费者组，还是原本的消费者组，都能消费topic的全部数据。</p>
 <img src="https://p.ipic.vip/ijkfdq.png" alt="img" style="zoom:50%;" />
@@ -374,12 +371,12 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2025/05/25/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Kafka%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" rel="prev" title="消息队列简介">
+                <a href="/2025/05/25/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%AE%80%E4%BB%8B/" rel="prev" title="消息队列简介">
                   <i class="fa fa-angle-left"></i> 消息队列简介
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2025/06/08/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Kafka%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" rel="next" title="Kafka性能优化">
+                <a href="/2025/06/08/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Kafka%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" rel="next" title="Kafka性能优化">
                   Kafka性能优化 <i class="fa fa-angle-right"></i>
                 </a>
             </div>

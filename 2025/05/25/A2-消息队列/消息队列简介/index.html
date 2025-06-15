@@ -22,28 +22,28 @@
     <meta name="description" content="消息队列作用：异步，解耦，削峰 缺点：可用性降低，增加系统复杂性（重复消费，消息丢失，顺序消费），数据一致性问题  系统可用性降低：加MQ 进来，万一 MQ 挂了，整套系统崩溃； 系统复杂度提高：怎么限制消息重复消费？怎么处理消息丢失？怎么保证消息顺序？ 数据一致性：A系统处理完后直接返回成功，别人以为这个请求成功了；但问题是，如果有ABC 三个系统，AB两个系统写库成功，结果 C系统写库失败，会">
 <meta property="og:type" content="article">
 <meta property="og:title" content="消息队列简介">
-<meta property="og:url" content="http://example.com/2025/05/25/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Kafka%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/index.html">
+<meta property="og:url" content="http://example.com/2025/05/25/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%AE%80%E4%BB%8B/index.html">
 <meta property="og:site_name" content="TurboCome">
 <meta property="og:description" content="消息队列作用：异步，解耦，削峰 缺点：可用性降低，增加系统复杂性（重复消费，消息丢失，顺序消费），数据一致性问题  系统可用性降低：加MQ 进来，万一 MQ 挂了，整套系统崩溃； 系统复杂度提高：怎么限制消息重复消费？怎么处理消息丢失？怎么保证消息顺序？ 数据一致性：A系统处理完后直接返回成功，别人以为这个请求成功了；但问题是，如果有ABC 三个系统，AB两个系统写库成功，结果 C系统写库失败，会">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://zjxdj6vnpk.feishu.cn/space/api/box/stream/download/asynccode/?code=MmU3MGVhZTUwZDk2OTgwZGNhOTkxYzgzZmQyZjE5ZTRfa1F1MXh3RURUaldrdFVENk13N0VmYnZTN1hWcVNqWkxfVG9rZW46TExudmJuemtrb1F6SDF4aWJDN2Mza3dpbkVlXzE3NDgxNzIyNTE6MTc0ODE3NTg1MV9WNA">
+<meta property="og:image" content="https://p.ipic.vip/l0mst9.png">
 <meta property="og:image" content="https://p.ipic.vip/k665aj.png">
-<meta property="og:image" content="https://zjxdj6vnpk.feishu.cn/space/api/box/stream/download/asynccode/?code=NTA5ODIyOGM4ZTc3NWQ4ZThlZWVkYjk4OGY3MDVjNGVfS1FiZ3pOaGY5WEV4ckUwU2JoQ3F3Y2lkZzhFaHZkZUpfVG9rZW46RUptN2J6SlBib2JqNDB4ckVPSGNoSG55bkg3XzE3NDgxNzIyNTE6MTc0ODE3NTg1MV9WNA">
+<meta property="og:image" content="http://example.com/Library/Application%20Support/typora-user-images/image-20250615182055131.png">
 <meta property="og:image" content="https://p.ipic.vip/ujbrnq.png">
 <meta property="og:image" content="https://p.ipic.vip/5hhv4u.png">
-<meta property="og:image" content="https://zjxdj6vnpk.feishu.cn/space/api/box/stream/download/asynccode/?code=MDNhNjJhZjY1NmJiYzY0MjgwMTBmY2U3ZGYwYmZmYTRfNVZKUUVUWVZkNEFCWkVaUWhPMWZZVG9Nbnl0ZWEyeW1fVG9rZW46T011NGJPa0w5bzBKekR4NjAxbmN1UFBObk9kXzE3NDgxNzMyNDk6MTc0ODE3Njg0OV9WNA">
+<meta property="og:image" content="https://p.ipic.vip/0xmju2.png">
 <meta property="article:published_time" content="2025-05-25T12:14:43.000Z">
-<meta property="article:modified_time" content="2025-06-08T14:13:08.254Z">
+<meta property="article:modified_time" content="2025-06-15T10:22:22.685Z">
 <meta property="article:author" content="TurboCome">
 <meta property="article:tag" content="消息队列MQ">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://zjxdj6vnpk.feishu.cn/space/api/box/stream/download/asynccode/?code=MmU3MGVhZTUwZDk2OTgwZGNhOTkxYzgzZmQyZjE5ZTRfa1F1MXh3RURUaldrdFVENk13N0VmYnZTN1hWcVNqWkxfVG9rZW46TExudmJuemtrb1F6SDF4aWJDN2Mza3dpbkVlXzE3NDgxNzIyNTE6MTc0ODE3NTg1MV9WNA">
+<meta name="twitter:image" content="https://p.ipic.vip/l0mst9.png">
 
 
-<link rel="canonical" href="http://example.com/2025/05/25/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Kafka%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/">
+<link rel="canonical" href="http://example.com/2025/05/25/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%AE%80%E4%BB%8B/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/05/25/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Kafka%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/","path":"2025/05/25/A2-消息队列/Kafka性能优化/","title":"消息队列简介"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/05/25/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%AE%80%E4%BB%8B/","path":"2025/05/25/A2-消息队列/消息队列简介/","title":"消息队列简介"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>消息队列简介 | TurboCome</title>
@@ -246,7 +246,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2025/05/25/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Kafka%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/05/25/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%AE%80%E4%BB%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar/avatar.jpg">
@@ -313,15 +313,18 @@
 </ul>
 <span id="more"></span>
 
-<h3 id="1-异步：提高处理速度"><a href="#1-异步：提高处理速度" class="headerlink" title="1.异步：提高处理速度"></a>1.<strong>异步：提高处理速度</strong></h3><img src="https://zjxdj6vnpk.feishu.cn/space/api/box/stream/download/asynccode/?code=MmU3MGVhZTUwZDk2OTgwZGNhOTkxYzgzZmQyZjE5ZTRfa1F1MXh3RURUaldrdFVENk13N0VmYnZTN1hWcVNqWkxfVG9rZW46TExudmJuemtrb1F6SDF4aWJDN2Mza3dpbkVlXzE3NDgxNzIyNTE6MTc0ODE3NTg1MV9WNA" alt="img" style="zoom: 40%;" />
+<h3 id="1-异步：提高处理速度"><a href="#1-异步：提高处理速度" class="headerlink" title="1.异步：提高处理速度"></a>1.<strong>异步：提高处理速度</strong></h3><img src="https://p.ipic.vip/l0mst9.png" alt="image-20250615182014934" style="zoom:33%;" />
 
 <h3 id="2-解耦：降低模块间耦合、依赖"><a href="#2-解耦：降低模块间耦合、依赖" class="headerlink" title="2.解耦：降低模块间耦合、依赖"></a>2.<strong>解耦：降低模块间耦合、依赖</strong></h3><img src="https://p.ipic.vip/k665aj.png" alt="image-20250525192548690" style="zoom:40%;" />
 
-<h3 id="3-削峰：削峰填谷，平衡流量"><a href="#3-削峰：削峰填谷，平衡流量" class="headerlink" title="3.削峰：削峰填谷，平衡流量"></a>3.<strong>削峰：削峰填谷，平衡流量</strong></h3><img src="https://zjxdj6vnpk.feishu.cn/space/api/box/stream/download/asynccode/?code=NTA5ODIyOGM4ZTc3NWQ4ZThlZWVkYjk4OGY3MDVjNGVfS1FiZ3pOaGY5WEV4ckUwU2JoQ3F3Y2lkZzhFaHZkZUpfVG9rZW46RUptN2J6SlBib2JqNDB4ckVPSGNoSG55bkg3XzE3NDgxNzIyNTE6MTc0ODE3NTg1MV9WNA" alt="img" style="zoom:40%;" />
+<h3 id="3-削峰：削峰填谷，平衡流量"><a href="#3-削峰：削峰填谷，平衡流量" class="headerlink" title="3.削峰：削峰填谷，平衡流量"></a>3.<strong>削峰：削峰填谷，平衡流量</strong></h3><img src="../../../../../Library/Application%20Support/typora-user-images/image-20250615182055131.png" alt="image-20250615182055131" style="zoom: 33%;" />
 
 
 
-<h3 id="如何保证消息不丢失？"><a href="#如何保证消息不丢失？" class="headerlink" title="如何保证消息不丢失？"></a>如何保证消息不丢失？</h3><p><img src="https://p.ipic.vip/ujbrnq.png" alt="img"></p>
+<h3 id="如何保证消息不丢失？"><a href="#如何保证消息不丢失？" class="headerlink" title="如何保证消息不丢失？"></a>如何保证消息不丢失？</h3><img src="https://p.ipic.vip/ujbrnq.png" alt="img" style="zoom:50%;" />
+
+  
+
 <h4 id="1-生产消息阶段"><a href="#1-生产消息阶段" class="headerlink" title="1.生产消息阶段"></a>1.<strong>生产消息阶段</strong></h4><p>生产者发送消息到Broker，需要处理 Broker的响应 ack，如果 Broker返回写入失败，需要重试发送，当多次发送失败，需要作报警，日志记录等。</p>
 <h4 id="2-存储消息阶段"><a href="#2-存储消息阶段" class="headerlink" title="2.存储消息阶段"></a>2.<strong>存储消息阶段</strong></h4><p>单机时：存储消息阶段需要在<strong>消息刷盘</strong>之后<strong>，</strong>再给生产者响应。假设消息写入缓存中就返回响应，那么机器突然断电会造成消息丢失，而生产者以为已经发送成功。</p>
 <p>集群部署时：有多副本机制，消息不仅要写入当前Broker，还需要写入副本中，需要配置成至少写入1台副本机子后，再给生产者响应。</p>
@@ -344,7 +347,7 @@
 
 <h4 id="2-部分有序"><a href="#2-部分有序" class="headerlink" title="2.部分有序"></a>2.<strong>部分有序</strong></h4><p><strong>核心：</strong>把消息通过特定的策略发往固定的队列中，将 Topic内部划分成需要的队列数，然后每个队列对应一个单线程处理的消费者，这样即完成部分有序的需求，又可以通过 队列数量的并发，提高消息处理效率。</p>
 <p>使用Hash取模法，让同一个订单发送到同一个队列中，同一个订单多步操作同步进行；顺序消费由消费者业务保证!</p>
-<img src="https://zjxdj6vnpk.feishu.cn/space/api/box/stream/download/asynccode/?code=MDNhNjJhZjY1NmJiYzY0MjgwMTBmY2U3ZGYwYmZmYTRfNVZKUUVUWVZkNEFCWkVaUWhPMWZZVG9Nbnl0ZWEyeW1fVG9rZW46T011NGJPa0w5bzBKekR4NjAxbmN1UFBObk9kXzE3NDgxNzMyNDk6MTc0ODE3Njg0OV9WNA" alt="img" style="zoom:50%;" />
+<img src="https://p.ipic.vip/0xmju2.png" alt="image-20250615182146771" style="zoom: 33%;" />
 
 
 
@@ -420,7 +423,7 @@
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2025/06/02/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%AE%80%E4%BB%8B/" rel="next" title="Kafka消息队列">
+                <a href="/2025/06/02/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Kafka%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" rel="next" title="Kafka消息队列">
                   Kafka消息队列 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
