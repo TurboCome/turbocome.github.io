@@ -19,12 +19,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="基本数据结构String 结构具体结构：动态字符串，类型ArrayList，可以实现动态扩容 1.保存数据 size，能够根据当前空间大小判断，避免存储字符串遭遇截断； 2.空间预分配，实际存储一个对象，预先多分片free空间，避免频繁分配空间； 3.惰性空间删除，删除对象后，空间不会立刻回收，避免再次添加数据； SDS与C字符串区别1.计数方式不同C字符串使用长度为 N+1 的字符数组来表示长度">
+    <meta name="description" content="基本数据结构String 结构具体结构：动态字符串，类型ArrayList，可以实现动态扩容 1.保存数据 size，能够根据当前空间大小判断，避免存储字符串遭遇截断； 2.空间预分配，实际存储一个对象，预先多分片free空间，避免频繁分配空间； 3.惰性空间删除，删除对象后，空间不会立刻回收，避免再次添加数据；">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis基本数据结构">
 <meta property="og:url" content="http://example.com/2025/06/15/A3-%E7%BC%93%E5%AD%98/Redis%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/index.html">
 <meta property="og:site_name" content="TurboCome">
-<meta property="og:description" content="基本数据结构String 结构具体结构：动态字符串，类型ArrayList，可以实现动态扩容 1.保存数据 size，能够根据当前空间大小判断，避免存储字符串遭遇截断； 2.空间预分配，实际存储一个对象，预先多分片free空间，避免频繁分配空间； 3.惰性空间删除，删除对象后，空间不会立刻回收，避免再次添加数据； SDS与C字符串区别1.计数方式不同C字符串使用长度为 N+1 的字符数组来表示长度">
+<meta property="og:description" content="基本数据结构String 结构具体结构：动态字符串，类型ArrayList，可以实现动态扩容 1.保存数据 size，能够根据当前空间大小判断，避免存储字符串遭遇截断； 2.空间预分配，实际存储一个对象，预先多分片free空间，避免频繁分配空间； 3.惰性空间删除，删除对象后，空间不会立刻回收，避免再次添加数据；">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://p.ipic.vip/bx0g3u.png">
 <meta property="og:image" content="https://p.ipic.vip/j9ko3x.png">
@@ -37,7 +37,7 @@
 <meta property="og:image" content="https://p.ipic.vip/cmkccc.png">
 <meta property="og:image" content="https://p.ipic.vip/w5bpkk.png">
 <meta property="article:published_time" content="2025-06-15T12:14:43.000Z">
-<meta property="article:modified_time" content="2025-06-15T12:39:24.768Z">
+<meta property="article:modified_time" content="2025-06-15T13:00:41.415Z">
 <meta property="article:author" content="TurboCome">
 <meta property="article:tag" content="Redis缓存">
 <meta name="twitter:card" content="summary">
@@ -312,10 +312,10 @@
 <p>1.保存数据 size，能够根据当前空间大小判断，避免存储字符串遭遇截断；</p>
 <p>2.空间预分配，实际存储一个对象，预先多分片free空间，避免频繁分配空间；</p>
 <p>3.惰性空间删除，删除对象后，空间不会立刻回收，避免再次添加数据；</p>
+<span id="more"></span> 
+
 <h3 id="SDS与C字符串区别"><a href="#SDS与C字符串区别" class="headerlink" title="SDS与C字符串区别"></a><strong>SDS与C字符串区别</strong></h3><h4 id="1-计数方式不同"><a href="#1-计数方式不同" class="headerlink" title="1.计数方式不同"></a>1.<strong>计数方式不同</strong></h4><p>C字符串使用长度为 N+1 的字符数组来表示长度为 N 的字符串，字符数组最后一个元素 ’\0‘，每次都需要遍历一遍整个数组来<strong>获取字符串长度 O(N)</strong> ；</p>
 <p>SDS结构自己保存 <strong>长度信息；</strong></p>
-<span id="more"></span>
-
 <h4 id="2-避免缓冲区溢出"><a href="#2-避免缓冲区溢出" class="headerlink" title="2.避免缓冲区溢出"></a>2.<strong>避免缓冲区溢出</strong></h4><p>C字符串在拼接或缩短操作时，可能会出现 <strong>缓冲区溢出&#x2F;内存泄漏</strong>问题。</p>
 <p>示例：需要在后面拼接时，但没计算好内存，结果可能因内存不足，被意外修改；</p>
 <p>SDS 结构存储<strong>当前长度+ free未使用长度</strong>，在做拼接操作时，会判断是否能够存下，如果<strong>长度足够直接执行</strong>，如果 <strong>不够则进行扩容。</strong></p>
