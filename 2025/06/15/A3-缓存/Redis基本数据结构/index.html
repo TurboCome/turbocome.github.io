@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="基本数据结构String 结构具体结构：动态字符串，类型ArrayList，可以实现动态扩容 1.保存数据 size，能够根据当前空间大小判断，避免存储字符串遭遇截断； 2.空间预分配，实际存储一个对象，预先多分片free空间，避免频繁分配空间； 3.惰性空间删除，删除对象后，空间不会立刻回收，避免再次添加数据； SDS与C字符串区别1.计数方式不同C字符串使用长度为 N+1 的字符数组来表示长度">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis基本数据结构">
+<meta property="og:url" content="http://example.com/2025/06/15/A3-%E7%BC%93%E5%AD%98/Redis%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/index.html">
+<meta property="og:site_name" content="TurboCome">
+<meta property="og:description" content="基本数据结构String 结构具体结构：动态字符串，类型ArrayList，可以实现动态扩容 1.保存数据 size，能够根据当前空间大小判断，避免存储字符串遭遇截断； 2.空间预分配，实际存储一个对象，预先多分片free空间，避免频繁分配空间； 3.惰性空间删除，删除对象后，空间不会立刻回收，避免再次添加数据； SDS与C字符串区别1.计数方式不同C字符串使用长度为 N+1 的字符数组来表示长度">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://p.ipic.vip/bx0g3u.png">
+<meta property="og:image" content="https://p.ipic.vip/j9ko3x.png">
+<meta property="og:image" content="https://p.ipic.vip/5zacxf.png">
+<meta property="og:image" content="https://p.ipic.vip/yeb487.png">
+<meta property="og:image" content="https://p.ipic.vip/gvi95n.png">
+<meta property="og:image" content="https://p.ipic.vip/gmre9c.png">
+<meta property="og:image" content="https://p.ipic.vip/p94cz6.png">
+<meta property="og:image" content="https://p.ipic.vip/mzg11q.png">
+<meta property="og:image" content="https://p.ipic.vip/cmkccc.png">
+<meta property="og:image" content="https://p.ipic.vip/w5bpkk.png">
+<meta property="article:published_time" content="2025-06-15T12:14:43.000Z">
+<meta property="article:modified_time" content="2025-06-15T12:39:24.768Z">
+<meta property="article:author" content="TurboCome">
+<meta property="article:tag" content="Redis缓存">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://p.ipic.vip/bx0g3u.png">
+
+
+<link rel="canonical" href="http://example.com/2025/06/15/A3-%E7%BC%93%E5%AD%98/Redis%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/06/15/A3-%E7%BC%93%E5%AD%98/Redis%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/","path":"2025/06/15/A3-缓存/Redis基本数据结构/","title":"Redis基本数据结构"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Redis基本数据结构 | TurboCome</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js" defer></script>
+  <script async src="https://hm.baidu.com/hm.js?dbd38ecdd37e06f1e9b027fc0fbc8e2e"></script>
+
+
+
+
+
+
+
+  
+  <script size="" alpha="" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/src/fireworks.js"></script>
+
+
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">TurboCome</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">淡泊明志，宁静致远！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">基本数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#String-%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.</span> <span class="nav-text">String 结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SDS%E4%B8%8EC%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%BA%E5%88%AB"><span class="nav-number">1.1.1.</span> <span class="nav-text">SDS与C字符串区别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E8%AE%A1%E6%95%B0%E6%96%B9%E5%BC%8F%E4%B8%8D%E5%90%8C"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">1.计数方式不同</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E9%81%BF%E5%85%8D%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">2.避免缓冲区溢出</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%87%8F%E5%B0%91%E5%86%85%E5%AD%98%E9%87%8D%E5%88%86%E9%85%8D%E6%AC%A1%E6%95%B0"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">3.减少内存重分配次数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E6%83%B0%E6%80%A7%E7%A9%BA%E9%97%B4%E9%87%8A%E6%94%BE"><span class="nav-number">1.1.1.4.</span> <span class="nav-text">4.惰性空间释放</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%AE%89%E5%85%A8"><span class="nav-number">1.1.1.5.</span> <span class="nav-text">5.二进制安全</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#List%E7%BB%93%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text">List结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E7%BB%93%E6%9E%84"><span class="nav-number">1.2.0.1.</span> <span class="nav-text">具体结构</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hash"><span class="nav-number">1.3.</span> <span class="nav-text">Hash</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E7%BB%93%E6%9E%84-1"><span class="nav-number">1.3.0.1.</span> <span class="nav-text">具体结构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B8%90%E8%BF%9B%E5%BC%8F-rehash"><span class="nav-number">1.3.1.</span> <span class="nav-text">渐进式 (rehash)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E5%8E%9F%E5%9B%A0"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">背景原因</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E8%BF%87%E7%A8%8B"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">具体过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%A9%E5%AE%B9%E6%9D%A1%E4%BB%B6"><span class="nav-number">1.3.1.3.</span> <span class="nav-text">扩容条件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%A9%E5%AE%B9%E6%9D%A1%E4%BB%B6"><span class="nav-number">1.3.1.4.</span> <span class="nav-text">缩容条件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Set"><span class="nav-number">1.4.</span> <span class="nav-text">Set</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SortedSet-zset"><span class="nav-number">1.5.</span> <span class="nav-text">SortedSet(zset)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ziplist%E7%BB%93%E6%9E%84"><span class="nav-number">1.5.1.</span> <span class="nav-text">ziplist结构</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%9D%A1%E4%BB%B6"><span class="nav-number">1.5.1.0.1.</span> <span class="nav-text">使用条件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#skiplist%E7%BB%93%E6%9E%84"><span class="nav-number">1.5.2.</span> <span class="nav-text">skiplist结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9A%8F%E6%9C%BA%E5%B1%82%E6%95%B0"><span class="nav-number">1.5.2.1.</span> <span class="nav-text">随机层数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%83%E7%B4%A0%E6%8E%92%E5%90%8D"><span class="nav-number">1.5.2.2.</span> <span class="nav-text">元素排名</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BitMap%E4%BD%8D%E5%9B%BE"><span class="nav-number">1.6.</span> <span class="nav-text">BitMap位图</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.6.0.1.</span> <span class="nav-text">应用场景</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="TurboCome"
+      src="/images/avatar/avatar.jpg">
+  <p class="site-author-name" itemprop="name">TurboCome</p>
+  <div class="site-description" itemprop="description">学而不思则罔，思而不学则殆！</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/TurboCome" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;TurboCome" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:turbocome@gmail.com" title="E-Mail → mailto:turbocome@gmail.com" rel="noopener me" target="_blank"><i class="fab fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/6161857964" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;6161857964" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/06/15/A3-%E7%BC%93%E5%AD%98/Redis%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar/avatar.jpg">
+      <meta itemprop="name" content="TurboCome">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TurboCome">
+      <meta itemprop="description" content="学而不思则罔，思而不学则殆！">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Redis基本数据结构 | TurboCome">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis基本数据结构
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-06-15 20:14:43" itemprop="dateCreated datePublished" datetime="2025-06-15T20:14:43+08:00">2025-06-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Redis%E7%BC%93%E5%AD%98/" itemprop="url" rel="index"><span itemprop="name">Redis缓存</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+          
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="基本数据结构"><a href="#基本数据结构" class="headerlink" title="基本数据结构"></a>基本数据结构</h1><h2 id="String-结构"><a href="#String-结构" class="headerlink" title="String 结构"></a><strong>String 结构</strong></h2><p><strong>具体结构：</strong>动态字符串，类型ArrayList，可以实现动态扩容</p>
+<p>1.保存数据 size，能够根据当前空间大小判断，避免存储字符串遭遇截断；</p>
+<p>2.空间预分配，实际存储一个对象，预先多分片free空间，避免频繁分配空间；</p>
+<p>3.惰性空间删除，删除对象后，空间不会立刻回收，避免再次添加数据；</p>
+<h3 id="SDS与C字符串区别"><a href="#SDS与C字符串区别" class="headerlink" title="SDS与C字符串区别"></a><strong>SDS与C字符串区别</strong></h3><h4 id="1-计数方式不同"><a href="#1-计数方式不同" class="headerlink" title="1.计数方式不同"></a>1.<strong>计数方式不同</strong></h4><p>C字符串使用长度为 N+1 的字符数组来表示长度为 N 的字符串，字符数组最后一个元素 ’\0‘，每次都需要遍历一遍整个数组来<strong>获取字符串长度 O(N)</strong> ；</p>
+<p>SDS结构自己保存 <strong>长度信息；</strong></p>
+<span id="more"></span>
+
+<h4 id="2-避免缓冲区溢出"><a href="#2-避免缓冲区溢出" class="headerlink" title="2.避免缓冲区溢出"></a>2.<strong>避免缓冲区溢出</strong></h4><p>C字符串在拼接或缩短操作时，可能会出现 <strong>缓冲区溢出&#x2F;内存泄漏</strong>问题。</p>
+<p>示例：需要在后面拼接时，但没计算好内存，结果可能因内存不足，被意外修改；</p>
+<p>SDS 结构存储<strong>当前长度+ free未使用长度</strong>，在做拼接操作时，会判断是否能够存下，如果<strong>长度足够直接执行</strong>，如果 <strong>不够则进行扩容。</strong></p>
+<img src="https://p.ipic.vip/bx0g3u.png" alt="image-20250615195157315" style="zoom:33%;" />
+
+<h4 id="3-减少内存重分配次数"><a href="#3-减少内存重分配次数" class="headerlink" title="3.减少内存重分配次数"></a>3.<strong>减少内存重分配次数</strong></h4><p>对字符串进行频繁拼接和截断操作，在写代码时忘记重新分配内存，则可能造成缓冲区溢出，以及内存泄露等问题。</p>
+<p>空间预分配：SDS进行扩展操作时，Redis会为 SDS分配好内存，根据指定的计算方式分配多余的 free空间，再继续拼接时，备用的 free空间会使用上，省去这次的内存重分配，优化了内存分配的消耗。</p>
+<img src="https://p.ipic.vip/j9ko3x.png" alt="image-20250615195357330" style="zoom:33%;" />
+
+<h4 id="4-惰性空间释放"><a href="#4-惰性空间释放" class="headerlink" title="4.惰性空间释放"></a>4.<strong>惰性空间释放</strong></h4><p>当执行完一个<strong>字符串缩减操作</strong>，为防止后续继续添加，redis并不会马上收回空间。当再次操作还没用到多余空间时，Redis才会收回多余空间，防止内存浪费，如果继续添加，则这个空间就能用上，从而减少内存的重分配。</p>
+<img src="https://p.ipic.vip/5zacxf.png" alt="image-20250615195508533" style="zoom:33%;" />
+
+<h4 id="5-二进制安全"><a href="#5-二进制安全" class="headerlink" title="5.二进制安全"></a><strong>5.二进制安全</strong></h4><p>C字符串必须符合ASCII码的编码格式，中间出现 ‘\0’ 会被判定为<strong>提前结束，</strong>因此<strong>只能保存文本数据</strong>；</p>
+<p>Redis保存<strong>字符串长度</strong>，不判断空字符而是判断长度， 所以保存各种二进制数据，更加安全；</p>
+<img src="https://p.ipic.vip/yeb487.png" alt="image-20250615195604526" style="zoom:33%;" />
+
+
+
+<h2 id="List结构"><a href="#List结构" class="headerlink" title="List结构"></a>List结构</h2><h4 id="具体结构"><a href="#具体结构" class="headerlink" title="具体结构"></a>具体<strong>结构</strong></h4><ul>
+<li>在数据量不大时（元素数量&lt;512），使用ziplist结构，申请一片连续空间，压缩列表。ziplist是一块连续的内存地址，他们之间无需持有前后指针，能通过地址顺序寻址访问；类似一个数组结构；</li>
+<li>元素数量&gt; 512时，使用LinkedList 结构，是普通的双写链表，有前后指针。目标：减少<strong>每个元素增加前、后指针带来的内存消耗</strong>，也减少内存碎片化问题。</li>
+</ul>
+<p><strong>应用场景：</strong>消息队列</p>
+<img src="https://p.ipic.vip/gvi95n.png" alt="image-20250615195729135" style="zoom:33%;" />
+
+
+
+<h2 id="Hash"><a href="#Hash" class="headerlink" title="Hash"></a><strong>Hash</strong></h2><h4 id="具体结构-1"><a href="#具体结构-1" class="headerlink" title="具体结构"></a>具体结构</h4><p>数组 + 链表，类似Java的HashMap，链地址法来解决哈希冲突，初始容量 16，2倍扩容；</p>
+<p>ht[0]用于存放<strong>真实</strong> key-vlaue数据； ht[1]用于<strong>扩容(rehash)；</strong></p>
+<p>Redis中哈希算法和哈希冲突跟Java实现类似，<strong>差异点</strong>：Redis哈希冲突，链表头插法；JDK1.8后Java哈希冲突，链表尾插法；</p>
+<h3 id="渐进式-rehash"><a href="#渐进式-rehash" class="headerlink" title="渐进式 (rehash)"></a><strong>渐进式 (rehash)</strong></h3><h4 id="背景原因"><a href="#背景原因" class="headerlink" title="背景原因"></a><strong>背景原因</strong></h4><ul>
+<li>Hash扩容比较耗时，需要重新申请新数组，然后将旧字典链表中的元素重新挂接到新数组O(n)，作为单线程Redis很难承受这样耗时过程；</li>
+<li>数据量如果过大的话，一次性rehash会有庞大的计算量，这可能导致服务器一段时间内停止服务，所以使用渐进式实现小步搬迁。</li>
+</ul>
+<h4 id="具体过程"><a href="#具体过程" class="headerlink" title="具体过程"></a>具体过程</h4><p>rehash时保留新旧两个 hash结构；</p>
+<ul>
+<li>查询时先查新hash，没有再查旧hash，并搬迁至新hash;  </li>
+<li>增加直接加到新hash;  </li>
+<li>修改先改新hash，没有改旧hash，然后删除hash搬迁至新hash；</li>
+<li>删除先删新hash，没有再删旧hash；</li>
+</ul>
+<p>例如要查找一个键的话，<strong>会优先查找ht[0]，如果不存在，再查找ht[1]<strong>。此外当执行</strong>新增操作</strong>时，新的键值对**一律保存到ht[1]**，不再对ht[0]进行任何操作，以保证ht[0]的键值对数量只减不增，直至变为空表。</p>
+<h4 id="扩容条件"><a href="#扩容条件" class="headerlink" title="扩容条件"></a>扩容条件</h4><ul>
+<li>hash表元素个数 &#x3D;&#x3D; 数组.size() 2 倍；</li>
+<li>如果Redis 正在做 bgsave(持久化命令)，为减少内存，尽量不去扩容；但如果 hash表非常满，达到数组长度 5 倍，这时就会强制扩容；</li>
+</ul>
+<h4 id="缩容条件"><a href="#缩容条件" class="headerlink" title="缩容条件"></a>缩容条件</h4><p>hash 表中<strong>元素个数 &lt;  数组.size() * 10%</strong> ，缩容不会考虑 是否在做 bgsave；</p>
+<p>对哈希表进行扩展&amp;收缩操作时，reash过程并不是一次性完成的，而是 <strong>渐进式</strong>地完成。</p>
+<h2 id="Set"><a href="#Set" class="headerlink" title="Set"></a><strong>Set</strong></h2><p><strong>具体结构：</strong>键值对无序、唯一，类似Java 的HashSet，内部的键值对是无序、唯一，在 HashMap基础上对所有 value &#x3D; NULL，拥有去重功能；</p>
+<h2 id="SortedSet-zset"><a href="#SortedSet-zset" class="headerlink" title="SortedSet(zset)"></a><strong>SortedSet(zset)</strong></h2><p>具体<strong>结构：</strong>ziplist  |  跳表(skiplist)； zset按照指定排序规则对输入字段进行排序，支持随机插入、删除； </p>
+<p>应用场景：排行榜</p>
+<h3 id="ziplist结构"><a href="#ziplist结构" class="headerlink" title="ziplist结构"></a>ziplist结构</h3><p>redis为节约内存而设计开发的数据结构ziplist，它是由一系列特殊编码的连续内存块组成的顺序型数据结构。一个压缩列表可以包含任意多个节点（entry），每个节点可以保存一个字节数组或一个整数值。</p>
+<h5 id="使用条件"><a href="#使用条件" class="headerlink" title="使用条件"></a>使用条件</h5><ul>
+<li>有序集合保存的元素 <strong>数量 &lt; 128个</strong></li>
+<li>有序集合保存的所有元素的<strong>长度 &lt; 64字节</strong></li>
+</ul>
+<img src="https://p.ipic.vip/gmre9c.png" alt="image-20250615200728495" style="zoom: 50%;" />
+
+<h3 id="skiplist结构"><a href="#skiplist结构" class="headerlink" title="skiplist结构"></a>skiplist结构</h3><p>每个节点随机出一个层数(level)，示例：一个节点随机出层数 3，把它链入到 第 1 层到第 3 层这三层链表中；每一个节点的层数（level）是随机出来的，而且新插入一个节点并不会影响到其他节点的层数。插入操作只需要 修改节点前后的指针，而不需要对多个节点都进行调整，这就降低插入操作的复杂度。 </p>
+<img src="https://p.ipic.vip/p94cz6.png" alt="image-20250615200927931" style="zoom: 50%;" />
+
+<p>示例：查找 23 这个不存在的数其查找路径为：</p>
+<img src="https://p.ipic.vip/mzg11q.png" alt="img" style="zoom: 67%;" />
+
+<p>看似是一个支持 <strong>二分查找的有序链表</strong>，在<strong>有序链表上面增加多级索引</strong>，通过索引实现快速查找。跳表不仅能提高搜索性能，同时也可以提高插入和删除操作的性能。</p>
+<p>1.插入、查询时间复杂度O(logn)</p>
+<p>2.数据天然有序</p>
+<p>3.链表结构，比树结构简单，性能更高；</p>
+<p>每个节点都有第一层指针，节点有第i层指针，那么第i+1层出现的概率为p，节点有最大层数限制 MaxLevel(32)。</p>
+<img src="https://p.ipic.vip/cmkccc.png" alt="img" style="zoom:67%;" />
+
+<p>Skip List包含多个层，每层称为一个level，level从 0开始递增。0层是最底层，包含所有的元素；每一个 level层都是一个有序的列表，level小的层包含 level大的层的元素；</p>
+<p>每个节点元素：1.节点key、2.节点value 、3.指向当前节点 level 指针</p>
+<h4 id="随机层数"><a href="#随机层数" class="headerlink" title="随机层数"></a><strong>随机层数</strong></h4><p>新插入节点，需要调用一个随机算法分配一个合理的层数；</p>
+<p>期望目标是 50% 概率被分配 Level 1； 25% 的概率被分配到 Level 2； 12.5% 的概率被分配到 Level 3，以此类推…有 2^(-63) 的概率被分配到最顶层，因为每一层的晋升率都是 50%，默认允许 <strong>最大的层数是 32</strong>，当 Level[0] 有 264 个元素时，才能达到 32 层。</p>
+<p><strong>插入节点：</strong>找到当前需要插入位置（包括相同 score 时的处理），创建新节点，调整前后指针指向，完成插入；</p>
+<p><strong>节点删除：</strong>先找”搜索路径”，然后对每层的相关节点重排一下前向后向指针，同时更新最高层数 maxLevel；</p>
+<p><strong>节点更新：</strong>如果对应 value 不存在就是插入过程；</p>
+<ul>
+<li>如果这个value 已经存在，调整一下 score值；</li>
+<li>如果新 score 值并不会带来排序上的变化，那就不需要调整位置，直接修改元素的score 值；</li>
+<li>如果排序位置改变，就需要调整位置，把这个元素删除再插入，需要经过两次路径搜索，调整顺序先删再插；</li>
+</ul>
+<h4 id="元素排名"><a href="#元素排名" class="headerlink" title="元素排名"></a><strong>元素排名</strong></h4><p>跳跃表是有序的，skiplist为每一个 forward 指针都增加 <strong>span 属性</strong>，表示从前一个节点沿着当前层的forward 指针跳到当前这个节点 <strong>中间会跳过多少个节点。</strong>在 插入&#x2F;删除操作时，会更新 span值，所以沿着 “搜索路径”把所有经过节点的 <strong>跨度 span 值累加，</strong>就可以算出当前元素的最终 rank 值。极端情况，跳跃表中所有 score 值都是一样，zset的查找性能会退化为 O(n)；</p>
+<p><strong>平衡树&amp;红黑树结构问题</strong></p>
+<ul>
+<li>性能问题：高并发情况下树结构需要执行rebalance 操作，可能涉及整棵树调整，跳跃表的变化只涉及局部；</li>
+<li><strong>实现成本：</strong>在复杂度与红黑树相同的情况，跳跃表实现起来更简单；</li>
+</ul>
+<h2 id="BitMap位图"><a href="#BitMap位图" class="headerlink" title="BitMap位图"></a><strong>BitMap位图</strong></h2><p><strong>具体结构：</strong>bitMap位图是一个由<strong>二进制位组成的数组</strong>，数组每个单元只能存储 0和1；</p>
+<img src="https://p.ipic.vip/w5bpkk.png" alt="image-20250615202119221" style="zoom:33%;" />
+
+<h4 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h4><p>1.布隆过滤器（缓存穿透）</p>
+<p>2.统计网页 PV &amp; UV数据，考虑使用 BitMap、HyperLogLog</p>
+<p><strong>具体使用：</strong>将数组中每个 <strong>二进制位与用户 ID 一一对应，</strong>使用位图记录每个用户当日是否访问，存储 1 的个数是UV数量。以当天日期加固定前缀作为key，建立一个Bitmap，每一位二进制 offset做为一个用户 ID标识，当今天用户访问时就将Bitmap中标识此用户的二进制位从0置为1，最后统计所有bitmap 中 1 的个数，即为独立访客数量。</p>
+<p><strong>set 集合统计问题：</strong>当数量庞大时，需要存储的 set集合会非常大，去重功能将耗费较高的时间复杂度，影响性能；</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Redis%E7%BC%93%E5%AD%98/" rel="tag"># Redis缓存</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/06/08/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Kafka%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" rel="prev" title="Kafka性能优化">
+                  <i class="fa fa-angle-left"></i> Kafka性能优化
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC82MDYyOS8zNzEwMA=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">TurboCome</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/TurboCome" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script src="/js/third-party/comments/livere.js" defer></script>
+
+</body>
+</html>

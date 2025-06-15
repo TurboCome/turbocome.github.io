@@ -186,18 +186,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-count">12</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -225,6 +225,97 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/06/15/A3-%E7%BC%93%E5%AD%98/Redis%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar/avatar.jpg">
+      <meta itemprop="name" content="TurboCome">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TurboCome">
+      <meta itemprop="description" content="学而不思则罔，思而不学则殆！">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | TurboCome">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2025/06/15/A3-%E7%BC%93%E5%AD%98/Redis%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="post-title-link" itemprop="url">Redis基本数据结构</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-06-15 20:14:43" itemprop="dateCreated datePublished" datetime="2025-06-15T20:14:43+08:00">2025-06-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Redis%E7%BC%93%E5%AD%98/" itemprop="url" rel="index"><span itemprop="name">Redis缓存</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+          
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="基本数据结构"><a href="#基本数据结构" class="headerlink" title="基本数据结构"></a>基本数据结构</h1><h2 id="String-结构"><a href="#String-结构" class="headerlink" title="String 结构"></a><strong>String 结构</strong></h2><p><strong>具体结构：</strong>动态字符串，类型ArrayList，可以实现动态扩容</p>
+<p>1.保存数据 size，能够根据当前空间大小判断，避免存储字符串遭遇截断；</p>
+<p>2.空间预分配，实际存储一个对象，预先多分片free空间，避免频繁分配空间；</p>
+<p>3.惰性空间删除，删除对象后，空间不会立刻回收，避免再次添加数据；</p>
+<h3 id="SDS与C字符串区别"><a href="#SDS与C字符串区别" class="headerlink" title="SDS与C字符串区别"></a><strong>SDS与C字符串区别</strong></h3><h4 id="1-计数方式不同"><a href="#1-计数方式不同" class="headerlink" title="1.计数方式不同"></a>1.<strong>计数方式不同</strong></h4><p>C字符串使用长度为 N+1 的字符数组来表示长度为 N 的字符串，字符数组最后一个元素 ’\0‘，每次都需要遍历一遍整个数组来<strong>获取字符串长度 O(N)</strong> ；</p>
+<p>SDS结构自己保存 <strong>长度信息；</strong></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/06/15/A3-%E7%BC%93%E5%AD%98/Redis%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1006,97 +1097,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2025/05/04/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E7%B4%A2%E5%BC%95/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2025/05/02/%E6%96%B9%E6%B3%95%E8%AE%BA/%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95%E8%AE%BA/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar/avatar.jpg">
-      <meta itemprop="name" content="TurboCome">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="TurboCome">
-      <meta itemprop="description" content="学而不思则罔，思而不学则殆！">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | TurboCome">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2025/05/02/%E6%96%B9%E6%B3%95%E8%AE%BA/%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95%E8%AE%BA/" class="post-title-link" itemprop="url">学习方法论</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2025-05-02 23:43:43" itemprop="dateCreated datePublished" datetime="2025-05-02T23:43:43+08:00">2025-05-02</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">学习</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%AD%A6%E4%B9%A0/%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95%E8%AE%BA/" itemprop="url" rel="index"><span itemprop="name">学习方法论</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-          
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h3 id="深度-–-链式学习法"><a href="#深度-–-链式学习法" class="headerlink" title="深度 – 链式学习法"></a>深度 – 链式学习法</h3><p>从一个技术点出发，不断的输入挖掘，不断的下探一步，问问自己为什么？</p>
-<h3 id="宽度-–-比较学习法"><a href="#宽度-–-比较学习法" class="headerlink" title="宽度 – 比较学习法"></a>宽度 – 比较学习法</h3><p>类似技术选项的调研，当前市面上还有哪些其他类型的技术，横向对比。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/05/02/%E6%96%B9%E6%B3%95%E8%AE%BA/%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95%E8%AE%BA/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
