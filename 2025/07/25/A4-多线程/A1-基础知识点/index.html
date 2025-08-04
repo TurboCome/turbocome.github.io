@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="多线程-锁Synchronized锁JDK1.6之前，Synchronized 属于重量级锁，效率低。  JDK1.6之后，Synchronized 锁是升级的过程：无锁–&gt;偏向锁–&gt;轻量级锁–&gt;重量级锁。随着竞争的激烈而逐渐升级（注：锁是可以升级不可降级，提高获得锁和释放锁的效率）。 从无锁状态，首先进入的线程获得偏向锁，当前释放后，此时如果同一个线程再次获得锁，锁不升级，偏向">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基础知识点">
+<meta property="og:url" content="http://example.com/2025/07/25/A4-%E5%A4%9A%E7%BA%BF%E7%A8%8B/A1-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E7%82%B9/index.html">
+<meta property="og:site_name" content="TurboCome">
+<meta property="og:description" content="多线程-锁Synchronized锁JDK1.6之前，Synchronized 属于重量级锁，效率低。  JDK1.6之后，Synchronized 锁是升级的过程：无锁–&gt;偏向锁–&gt;轻量级锁–&gt;重量级锁。随着竞争的激烈而逐渐升级（注：锁是可以升级不可降级，提高获得锁和释放锁的效率）。 从无锁状态，首先进入的线程获得偏向锁，当前释放后，此时如果同一个线程再次获得锁，锁不升级，偏向">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/Library/Application%20Support/typora-user-images/image-20250804204248935.png">
+<meta property="og:image" content="https://p.ipic.vip/5ncdtg.png">
+<meta property="article:published_time" content="2025-07-25T11:38:43.000Z">
+<meta property="article:modified_time" content="2025-08-04T13:15:01.172Z">
+<meta property="article:author" content="TurboCome">
+<meta property="article:tag" content="多线程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/Library/Application%20Support/typora-user-images/image-20250804204248935.png">
+
+
+<link rel="canonical" href="http://example.com/2025/07/25/A4-%E5%A4%9A%E7%BA%BF%E7%A8%8B/A1-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E7%82%B9/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/07/25/A4-%E5%A4%9A%E7%BA%BF%E7%A8%8B/A1-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E7%82%B9/","path":"2025/07/25/A4-多线程/A1-基础知识点/","title":"基础知识点"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>基础知识点 | TurboCome</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js" defer></script>
+  <script async src="https://hm.baidu.com/hm.js?dbd38ecdd37e06f1e9b027fc0fbc8e2e"></script>
+
+
+
+
+
+
+
+  
+  <script size="" alpha="" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/src/fireworks.js"></script>
+
+
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">TurboCome</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">淡泊明志，宁静致远！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B-%E9%94%81"><span class="nav-number">1.</span> <span class="nav-text">多线程-锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Synchronized%E9%94%81"><span class="nav-number">1.1.</span> <span class="nav-text">Synchronized锁</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%81%8F%E5%90%91%E9%94%81"><span class="nav-number">1.1.1.</span> <span class="nav-text">偏向锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BD%BB%E9%87%8F%E7%BA%A7%E9%94%81%EF%BC%88%E8%87%AA%E6%97%8B%E9%94%81%EF%BC%89"><span class="nav-number">1.1.2.</span> <span class="nav-text">轻量级锁（自旋锁）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%87%AA%E6%97%8B%E9%94%81%E6%B3%A8%E6%84%8F"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">自旋锁注意</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%98%E5%9C%A8%E7%9A%84%E9%97%AE%E9%A2%98-%E4%B8%8D%E5%8F%AF%E9%80%86"><span class="nav-number">1.1.3.</span> <span class="nav-text">存在的问题(不可逆)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#synchronized%E5%92%8CReentrantLock-%E5%8C%BA%E5%88%AB"><span class="nav-number">1.1.4.</span> <span class="nav-text">synchronized和ReentrantLock 区别</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-%E5%8F%AF%E9%87%8D%E5%85%A5%E9%94%81"><span class="nav-number">1.1.4.1.</span> <span class="nav-text">1.可重入锁</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-synchronized%E6%98%AFJVM%E5%B1%82%E9%9D%A2%EF%BC%8CReentrantLock%E6%98%AF-API%E5%B1%82%E9%9D%A2"><span class="nav-number">1.1.4.2.</span> <span class="nav-text">2.synchronized是JVM层面，ReentrantLock是 API层面</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-%E5%8F%AF%E4%B8%AD%E6%96%AD%E9%94%81"><span class="nav-number">1.1.4.3.</span> <span class="nav-text">3.可中断锁</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-%E5%85%AC%E5%B9%B3%E9%94%81"><span class="nav-number">1.1.4.4.</span> <span class="nav-text">4.公平锁</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5-%E9%80%89%E6%8B%A9%E6%80%A7%E9%80%9A%E7%9F%A5%EF%BC%88%E9%94%81%E7%BB%91%E5%AE%9A%E5%A4%9A%E4%B8%AA%E6%9D%A1%E4%BB%B6%EF%BC%89"><span class="nav-number">1.1.4.5.</span> <span class="nav-text">5.选择性通知（锁绑定多个条件）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Volatile%E5%85%B3%E9%94%AE%E5%AD%97"><span class="nav-number">1.2.</span> <span class="nav-text">Volatile关键字</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E5%8F%AF%E8%A7%81%E6%80%A7"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.可见性</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%89%A9%E5%B1%95-%E5%A6%82%E4%BD%95%E5%8F%91%E7%8E%B0%E6%95%B0%E6%8D%AE%E5%A4%B1%E6%95%88%EF%BC%9F"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">扩展-如何发现数据失效？</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E5%86%85%E5%AD%98%E5%92%8C%E4%B8%BB%E5%86%85%E5%AD%98%E5%85%B3%E7%B3%BB"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">工作内存和主内存关系</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8A%A0%E9%94%81%E8%A7%A3%E5%86%B3%E5%8F%AF%E8%A7%81%E6%80%A7"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">加锁解决可见性</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E6%9C%89%E5%BA%8F%E6%80%A7"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.有序性</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9C-%E4%BF%9D%E8%AF%81%E4%B8%8D%E4%BC%9A%E8%A2%AB%E9%87%8D%E6%8E%92%E5%BA%8F"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">内存屏障-保证不会被重排序</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%8E%9F%E5%AD%90%E6%80%A7-%E4%B8%8D%E4%BF%9D%E8%AF%81"><span class="nav-number">1.2.3.</span> <span class="nav-text">3.原子性-不保证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#volatile%E4%B8%8Esynchronized%E5%8C%BA%E5%88%AB"><span class="nav-number">1.2.4.</span> <span class="nav-text">volatile与synchronized区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.2.5.</span> <span class="nav-text">使用场景</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0"><span class="nav-number">2.</span> <span class="nav-text">线程池</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E4%B8%89%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="nav-number">2.1.</span> <span class="nav-text">创建线程三种方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Callable-%E5%92%8C-Runnable%E5%8C%BA%E5%88%AB"><span class="nav-number">2.2.</span> <span class="nav-text">Callable 和 Runnable区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%A7%8D%E7%B1%BB"><span class="nav-number">2.3.</span> <span class="nav-text">常见线程池种类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%A0%B8%E5%BF%83%E5%8F%82%E6%95%B0"><span class="nav-number">2.4.</span> <span class="nav-text">线程池核心参数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B"><span class="nav-number">2.4.1.</span> <span class="nav-text">执行过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A5%B1%E5%92%8C%E7%AD%96%E7%95%A5"><span class="nav-number">2.4.2.</span> <span class="nav-text">饱和策略</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97"><span class="nav-number">2.5.</span> <span class="nav-text">阻塞队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97"><span class="nav-number">2.6.</span> <span class="nav-text">非阻塞队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0-%E7%BA%BF%E7%A8%8B%E6%95%B0%E9%87%8F%E8%AE%BE%E7%BD%AE"><span class="nav-number">2.7.</span> <span class="nav-text">线程池-线程数量设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#execute%E5%92%8Csubmit%E5%8C%BA%E5%88%AB"><span class="nav-number">2.8.</span> <span class="nav-text">execute和submit区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#start%E5%92%8C-run%E5%8C%BA%E5%88%AB"><span class="nav-number">2.9.</span> <span class="nav-text">start和 run区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%94%A4%E9%86%92%E9%98%BB%E5%A1%9E%E7%BA%BF%E7%A8%8B%E6%96%B9%E5%BC%8F"><span class="nav-number">2.10.</span> <span class="nav-text">唤醒阻塞线程方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CyclicBarrier%E5%92%8CCountDownLatch%E5%8C%BA%E5%88%AB"><span class="nav-number">2.11.</span> <span class="nav-text">CyclicBarrier和CountDownLatch区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Condition%E5%92%8Cwait-notify%E5%8C%BA%E5%88%AB"><span class="nav-number">2.12.</span> <span class="nav-text">Condition和wait&#x2F;notify区别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Condition"><span class="nav-number">2.12.1.</span> <span class="nav-text">Condition</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wait-%E5%92%8Csleep-%E5%8C%BA%E5%88%AB"><span class="nav-number">2.13.</span> <span class="nav-text">wait()和sleep()区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E4%BA%94%E4%B8%AA%E7%8A%B6%E6%80%81"><span class="nav-number">2.14.</span> <span class="nav-text">线程五个状态</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="TurboCome"
+      src="/images/avatar/avatar.jpg">
+  <p class="site-author-name" itemprop="name">TurboCome</p>
+  <div class="site-description" itemprop="description">学而不思则罔，思而不学则殆！</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/TurboCome" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;TurboCome" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:turbocome@gmail.com" title="E-Mail → mailto:turbocome@gmail.com" rel="noopener me" target="_blank"><i class="fab fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/6161857964" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;6161857964" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/07/25/A4-%E5%A4%9A%E7%BA%BF%E7%A8%8B/A1-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E7%82%B9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar/avatar.jpg">
+      <meta itemprop="name" content="TurboCome">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TurboCome">
+      <meta itemprop="description" content="学而不思则罔，思而不学则殆！">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="基础知识点 | TurboCome">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          基础知识点
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-07-25 19:38:43" itemprop="dateCreated datePublished" datetime="2025-07-25T19:38:43+08:00">2025-07-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">多线程</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+          
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="多线程-锁"><a href="#多线程-锁" class="headerlink" title="多线程-锁"></a><strong>多线程-锁</strong></h2><h3 id="Synchronized锁"><a href="#Synchronized锁" class="headerlink" title="Synchronized锁"></a>Synchronized锁</h3><p>JDK1.6之前，Synchronized 属于重量级锁，效率低。 </p>
+<p>JDK1.6之后，Synchronized 锁是升级的过程：无锁–&gt;偏向锁–&gt;轻量级锁–&gt;重量级锁。随着竞争的激烈而逐渐升级（注：锁是可以升级不可降级，提高获得锁和释放锁的效率）。</p>
+<p>从无锁状态，首先进入的线程获得偏向锁，当前释放后，此时如果同一个线程再次获得锁，锁不升级，偏向于同一线程；此时如果其他线程获得锁，并产生锁的竞争，则将锁升级为轻量级锁。升级到轻量级锁后，同样也使用CAS操作判断，如果同一线程，CAS成功修改 monitor中计算器+1。如果CAS操作失败，则自旋，一旦可以获取资源，就直接尝试成功，直到超出自旋阈值（10）。则自旋失败，升级为重量级锁，像1.6之前版本一样，等待唤醒。</p>
+<span id="more"></span> 
+
+<h4 id="偏向锁"><a href="#偏向锁" class="headerlink" title="偏向锁"></a><strong>偏向锁</strong></h4><p>采用CAS操作，每次同一线程进入，虚拟机就不进行任何同步操作，对标志位+1，不同线程过来，CAS操作失败。</p>
+<p>CAS操作：jvm会存储 锁对象Mark Word 拷贝，然后利用 CAS比较当前的Mark Word和保存的Mark Word，相同就说明加锁成功，改变锁标志位。</p>
+<h4 id="轻量级锁（自旋锁）"><a href="#轻量级锁（自旋锁）" class="headerlink" title="轻量级锁（自旋锁）"></a><strong>轻量级锁（自旋锁）</strong></h4><p>轻量级锁通过不断自旋，来防止线程被挂起；<strong>线程等待唤醒</strong> 是 <strong>用户态和内核态</strong> 的切换，此过程很耗资源，可通过自旋减少这种消耗(短时间)。</p>
+<h5 id="自旋锁注意"><a href="#自旋锁注意" class="headerlink" title="自旋锁注意"></a>自旋锁注意</h5><p>1.自旋时不释放CPU，持有自旋锁的线程应尽快释放锁，否则等待该自旋锁的线程会一直自旋，浪费CPU时间。</p>
+<p>2.持有自旋锁的线程在 sleep之前应该释放自旋锁，以便其它线程可以获得自旋锁；</p>
+<p>4.自旋锁比较适用于锁使用者保持锁时间比较短的情况，此时效率比较高；</p>
+<p>5.自旋锁是一种对多处理器相当有效的机制，⽽在单处理器非抢占式的系统中，基本上没有作⽤；</p>
+<h4 id="存在的问题-不可逆"><a href="#存在的问题-不可逆" class="headerlink" title="存在的问题(不可逆)"></a>存在的<strong>问题(不可逆)</strong></h4><p>例：我现在是滴滴，早上有打车高峰，代码使用了大量的synchronized，锁升级过程是不可逆的，过了高峰我们还是重量级的锁，那效率降低。需要根据具体业务场景进行选择。</p>
+<h4 id="synchronized和ReentrantLock-区别"><a href="#synchronized和ReentrantLock-区别" class="headerlink" title="synchronized和ReentrantLock 区别"></a><strong>synchronized和ReentrantLock 区别</strong></h4><h5 id="1-可重入锁"><a href="#1-可重入锁" class="headerlink" title="1.可重入锁"></a>1.可重入锁</h5><p>同一个线程可以多次获取同一把锁，ReentrantLock和synchronized都是可重入锁。</p>
+<h5 id="2-synchronized是JVM层面，ReentrantLock是-API层面"><a href="#2-synchronized是JVM层面，ReentrantLock是-API层面" class="headerlink" title="2.synchronized是JVM层面，ReentrantLock是 API层面"></a>2.synchronized是JVM层面，ReentrantLock是 API层面</h5><p>synchronized由jvm负责加锁，释放锁等操作，不需要我们维护；RentrantLock 是需要 lock() 和 unlock() 方法配合 try&#x2F;finally 语句块来完成；</p>
+<h5 id="3-可中断锁"><a href="#3-可中断锁" class="headerlink" title="3.可中断锁"></a>3.<strong>可中断锁</strong></h5><p>线程尝试获取锁的过程中，是否可以响应中断，synchronized是不可中断的，ReentrantLock 是可中断的，通过 lock.lockInterruptibly() 实现，可以使正在等待的线程选择放弃等待；</p>
+<h5 id="4-公平锁"><a href="#4-公平锁" class="headerlink" title="4.公平锁"></a><strong>4.公平锁</strong></h5><p>多个线程 同时尝试获取同一把锁时，获取锁的顺序按照线程达到的顺序。<strong>非公平锁：</strong>允许线程“插队”，synchronized只有非公平锁；ReentrantLock 可以通过参数设置公平，非公平锁。 </p>
+<h5 id="5-选择性通知（锁绑定多个条件）"><a href="#5-选择性通知（锁绑定多个条件）" class="headerlink" title="5.选择性通知（锁绑定多个条件）"></a>5.选择性通知（锁绑定多个条件）</h5><p>synchronized关键字与 wait()和 notify()&#x2F;notifyAll()方法相结合可以实现 <strong>等待&#x2F;通知机制</strong>，但被通知的线程是由 JVM 选择无法控制，如果执行 notifyAll()方法会通知所有处于等待状态的线程； </p>
+<p>而 <strong>ReentrantLock类结合 Condition实例可以实现“选择性通知”</strong> ，Condition 可以为不同线程 <strong>注册不同Condition实例</strong>，执行 Condition实例的 signalAll()方法时 只会唤醒注册在该Condition实例中的所有等待线程。 </p>
+<h3 id="Volatile关键字"><a href="#Volatile关键字" class="headerlink" title="Volatile关键字"></a><strong>Volatile关键字</strong></h3><h4 id="1-可见性"><a href="#1-可见性" class="headerlink" title="1.可见性"></a>1.<strong>可见性</strong></h4><p>Volatile修饰的共享变量，使用缓存一致性协议，当一个线程修改 volatile修饰的变量，立即修改写回主内存，同时发信号通知其他线程将该变量的缓存行置为无效状态，当其他线程需要读取这个变量时，发现自己缓存中该变量的缓存行是无效的，就会从内存重新读取，得到最新数据。</p>
+<h5 id="扩展-如何发现数据失效？"><a href="#扩展-如何发现数据失效？" class="headerlink" title="扩展-如何发现数据失效？"></a>扩展-<strong>如何发现数据失效？</strong></h5><p><strong>嗅探：</strong> 每个处理器通过 <strong>嗅探在总线上传播的数据</strong>来检查自己缓存值是不是过期，当处理器发现<strong>自己缓存行对应的内存地址被修改，</strong>会将当前自己的<strong>缓存行设置成无效状态</strong>，当处理器对这个数据进行修改操作时，会重新从系统内存中把数据读到处理器缓存里。</p>
+<p><strong>总线风暴：</strong>由于Volatile的 MESI缓存一致性协议，<strong>需要不断的从主内存嗅探和 cas 不断循环</strong>，无效交互会导致<strong>总线带宽达到峰值。</strong> 所以不要大量使用Volatile。</p>
+<h5 id="工作内存和主内存关系"><a href="#工作内存和主内存关系" class="headerlink" title="工作内存和主内存关系"></a><strong>工作内存和主内存关系</strong></h5><p>所有共享变量都存储于主内存，线程对变量的操作(读&#x2F;写)是在 <strong>工作内存</strong>中完成，而不是直接读写<strong>主内存</strong>中的变量。不同线程之间不能直接访问对方工作内存中的变量，线程间变量值的传递需要通过主内存中转来完成。 </p>
+<img src="../../../../../Library/Application%20Support/typora-user-images/image-20250804204248935.png" alt="image-20250804204248935" style="zoom:25%;" />
+
+<p>多个处理器运算任务都涉及同一块主内存区域时，将可能导致各自的缓存数据不一致，那同步回到主内存时以谁的缓存数据为准呢？为解决一致性问题，需要各个处理器访问缓存时都遵循一些协议，在读写时要根据协议来进行操作。</p>
+<p>MESI（缓存一致性协议）：当 CPU写数据时，如果发现操作的变量是共享变量，会发出信号通知其他CPU将该变量的缓存行置为无效状态，因此当其他CPU需要读取这个变量时，发现<strong>自己缓存中该变量的缓存行</strong>是无效的，就会从内存重新读取。</p>
+<h5 id="加锁解决可见性"><a href="#加锁解决可见性" class="headerlink" title="加锁解决可见性"></a><strong>加锁解决可见性</strong></h5><p>某一个线程进入 synchronized代码块，线程获得锁后<strong>会清空工作内存</strong>，从主内存拷贝共享变量最新的值到工作内存成为副本，执行代码后，将修改后的 <strong>副本值刷新回主内存中</strong>，线程释放锁。而获取不到锁的线程会阻塞等待，所以变量的值肯定一直都是最新的。</p>
+<h4 id="2-有序性"><a href="#2-有序性" class="headerlink" title="2.有序性"></a>2.<strong>有序性</strong></h4><p><strong>禁止指令重排序</strong></p>
+<p>扩展-<strong>重排序</strong></p>
+<p>为提高处理速度，JVM会对代码进行编译优化，也就是指令重排序优化，并发编程下指令重排序会带来一些安全隐患：如 <strong>指令重排序导致的多个线程操作之间的不可见性；</strong></p>
+<p><strong>禁止指令重排序好处-例如：</strong>创建对象需要几个步骤：1.分配内存空间;   2.调用构造器初始化实例 ;  3.返回地址给引用；在执行时可能发生指令重排序，有可能 <strong>构造函数在对象初始化完成前就赋值完成</strong>，在内存里开辟一片存储区域后直接返回内存的引用，这个时候还没真正的初始化完对象，但别的线程去判断 instance!&#x3D;null，直接拿去用，此时这个对象是个半成品，那就有空指针异常了。</p>
+<h5 id="内存屏障-保证不会被重排序"><a href="#内存屏障-保证不会被重排序" class="headerlink" title="内存屏障-保证不会被重排序"></a><strong>内存屏障-保证不会被重排序</strong></h5><p>Volatile借助Java编译器，在生成指令系列时的适当位置插入 <strong>内存屏障</strong> 指令，来禁止特定类型的处理器重排序。</p>
+<p>Volatile写：在前面和后面分别插入内存屏障； </p>
+<p>volatile读：在后面插入两个内存屏障；</p>
+<h4 id="3-原子性-不保证"><a href="#3-原子性-不保证" class="headerlink" title="3.原子性-不保证"></a>3.原子性-不保证</h4><p><strong>Volatile无法保证原子性，</strong>要实现原子性操作，可以考虑加锁、原子类，比如 AtomicInteger；</p>
+<h4 id="volatile与synchronized区别"><a href="#volatile与synchronized区别" class="headerlink" title="volatile与synchronized区别"></a><strong>volatile与synchronized区别</strong></h4><p><strong>1.修饰内容：</strong>volatile只能修饰 <strong>变量</strong>（实例变量、类变量）；synchronized可以修饰 <strong>方法，以及代码块；</strong></p>
+<p><strong>2.三性保证：</strong>volatile保证数据的 可见、有序性；synchronized能保证 可见、有序、原子性；</p>
+<p><strong>3.解决问题不同：</strong>volatile解决变量在多线程之间的可见性；synchronized解决多线程之间访问资源的同步性</p>
+<p><strong>4.是否阻塞：</strong>多线程访问 <strong>volatile不会阻塞；</strong>synchronized 可能会发生阻塞；</p>
+<p><strong>总结：</strong>volatile可以看做是轻量版的 synchronized，volatile不保证原子性；如果一个共享变量进行多个线程的赋值，没有其他操作，那可以用volatile来代替synchronized，因为赋值本身是原子性的，而volatile又保证可见性，所以可以保证线程安全。</p>
+<h4 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a><strong>使用场景</strong></h4><ol>
+<li>volatile提供可见性，任何一个线程对其修改将立马对其他线程可见，volatile属性不会被线程缓存；</li>
+<li>volatile可以对一些原子性操作实现加锁的效果；</li>
+</ol>
+<h2 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h2><h3 id="创建线程三种方式"><a href="#创建线程三种方式" class="headerlink" title="创建线程三种方式"></a>创建线程三种方式</h3><p>1.继承 Thread 类，重写run() 方法，在run() 方法里实现内部逻辑；</p>
+<p>2.实现 Runnable 接口， 重写 Runnable 接口中的 run 方法，在 thread 类中传入 Runnable对象；</p>
+<p>3.实现 Callable 接口，重写 call() 方法，通过Future 来获取返回结果；在线程池提交Callable任务后返回一个Future对象，使用它可以知道 Callable任务的状态和得到Callable返回的执⾏结果。Future提供get()方法，等待Callable结束并获取它的执行结果。</p>
+<p>4.通过 线程池创建线程；</p>
+<h3 id="Callable-和-Runnable区别"><a href="#Callable-和-Runnable区别" class="headerlink" title="Callable 和 Runnable区别"></a>Callable 和 Runnable区别</h3><p>1.Runnable 不会产生任何返回值，Callable 有返回值；</p>
+<p>2.Callable重写 call 方法，Runnable 重写 run 方法；</p>
+<p>3.使用 Callable 中 call方法可以抛出异常，而 Runnable 方法不能抛出异常；</p>
+<h3 id="常见线程池种类"><a href="#常见线程池种类" class="headerlink" title="常见线程池种类"></a>常见线程池种类</h3><p>1.<strong>SingleThreadPool 单个线程：</strong>若多余一个任务被提交到该线程池，任务会被保存在一个任务队列中，待线程空闲，按先入先出顺序执行队列中的任务。</p>
+<p>2.<strong>FixedThreadPool 固定线程数量：</strong>线程数量始终不变。当一个新的任务提交时，线程池中若有空闲线程，则立即执行。若没有，新任务会被暂存在一个任务队列中，待有线程空闲时，便处理在任务队列中的任务。</p>
+<p>3.<strong>CachedThreadPool 动态分配线程数量：</strong>根据具体任务数量来调整线程数量，若有空闲线程可以复用，会优先使用可复用的线程。若所有线程均在工作，又有新任务提交，则会创建新的线程处理任务。所有线程在当前任务执行完毕后，将返回线程池进行复用。</p>
+<h3 id="线程池核心参数"><a href="#线程池核心参数" class="headerlink" title="线程池核心参数"></a><strong>线程池核心参数</strong></h3><p><strong>1.corePoolSize :</strong>  核心线程数，定义最小可以同时运行的线程数量。<strong>核心线程数默认情况下会一直存活</strong>，但当将allowCoreThreadTimeout 设置为true时，核心线程也会超时回收。</p>
+<p><strong>2.maximumPoolSize：</strong>当队列中存放的任务数量达到队列最大容量时，可以同时运行的线程数量变为最大线程数；</p>
+<p><strong>3.workQueue：</strong>当新任务到来时，判断当前运行的线程数是否达到核心线程数，如果达到则将新任务添加到队列； </p>
+<p><strong>4.keepAliveTime：</strong>当线程池中的线程数量大于 corePoolSize 时，此时如果没有新任务提交，<strong>核心线程外的线程 不会立即销毁，</strong>而是等待直到时间超过 keepAliveTime才会被回收销毁；</p>
+<p><strong>5.unit :</strong>  keepAliveTime 参数的时间单位。</p>
+<p><strong>6.handler（</strong>饱和策略）：当线程数量达到maximumPoolSize，并且workQueue中任务满时，执行饱和操作。 </p>
+<h4 id="执行过程"><a href="#执行过程" class="headerlink" title="执行过程"></a>执行过程</h4><p>1.当线程数 &lt; corePoolSize时，创建线程执⾏任务；</p>
+<p>2.当线程数 &gt;&#x3D; corePoolSize并且 workQueue没有满时，放入workQueue中；</p>
+<p>3.线程数  &gt;&#x3D;corePoolSize并且 workQueue满时，新任务<strong>新建线程运行</strong>，线程总数要 &lt; maximumPoolSize；</p>
+<p>4.当线程总数 &#x3D;&#x3D;maximumPoolSize并且 workQueue满了的时候， 执行 handler的rejectedExecution 拒绝策略；</p>
+<h4 id="饱和策略"><a href="#饱和策略" class="headerlink" title="饱和策略"></a><strong>饱和策略</strong></h4><p>1.不处理新任务，直接丢弃掉；</p>
+<p>2.丢弃最早未处理的任务请求；</p>
+<p>3.抛出 RejectedExecutionException 异常，拒绝新任务的处理；</p>
+<p>4.增加队列容量，如果应用程序可以承受此延迟并且不允许丢弃任何一个任务请求，可以选择。这种策略会降低新任务的提交速度，影响程序的整体性能。</p>
+<h3 id="阻塞队列"><a href="#阻塞队列" class="headerlink" title="阻塞队列"></a><strong>阻塞队列</strong></h3><p>一个支持两个附加操作的队列，这两个附加的操作支持阻塞的插入和移除方法。</p>
+<p>1）支持阻塞的插入方法：当队列满时，队列会阻塞插入元素的线程，直到队列不满；</p>
+<p>2）支持阻塞的移除方法：当队列空时，获取元素的线程会等待队列变为非空，再获取数据；</p>
+<p>阻塞队列常用于生产者和消费者的场景，生产者是向队列里添加元素的线程，消费者是从队列里取元素的线程。阻塞队列就是生产者用来存放元素、消费者用来获取元素的容器。</p>
+<h3 id="非阻塞队列"><a href="#非阻塞队列" class="headerlink" title="非阻塞队列"></a><strong>非阻塞队列</strong></h3><p>入队和出队操作均利用CAS更新，允许多个线程并发执行，并且不会因为加锁而阻塞线程，使得并发性能更好。</p>
+<h3 id="线程池-线程数量设置"><a href="#线程池-线程数量设置" class="headerlink" title="线程池-线程数量设置"></a><strong>线程池-线程数量设置</strong></h3><p><strong>最佳线程数目</strong>  &#x3D; （（<strong>等待时间+CPU时间）&#x2F; CPU时间</strong> ）* CPU核数</p>
+<p>例如：CPU 使用率 50% （ 线程CPU时间&#x2F;(<strong>线程等待时间+线程CPU时间</strong>）），那么这段时间可以运行 2 个IO任务</p>
+<p><strong>CPU密集型任务：</strong>较小线程数</p>
+<p><strong>IO密集型任务：    较多线程数</strong></p>
+<p>IO操作不占用CPU，不让CPU闲；但如果线程数目太多，线程切换所带来的开销也会对系统的响应时间带来影响。</p>
+<p><strong>线程等待时间所占比例越高，需要越多线程。线程CPU时间 所占比例越高，需要越少线程</strong>。</p>
+<h3 id="execute和submit区别"><a href="#execute和submit区别" class="headerlink" title="execute和submit区别"></a><strong>execute和submit区别</strong></h3><p>1.execute无返回值**，无法判断任务 **是否被线程池执行成功；</p>
+<p>2.submit有返回值**， 线程池会返回一个 <strong>Future 类型的对象</strong>，通过这个 Future 对象可以 **判断任务是否执行成功，并且通过 Future 的 get() 方法来获取返回值，get() 方法会阻塞当前线程直到任务完成。</p>
+<p>3.当一个线程池里面的线程异常后：</p>
+<ul>
+<li>执行execute时，内部处理，无异常抛出，线程池会把这个线程移除掉，并创建一个新的线程放到线程池中；</li>
+<li>执行submit时，堆栈异常没有输出，但调用<code>Future.get()</code>方法时，可以捕获到异常，不会把这个线程移除掉，也不会创建新的线程放入到线程池中，复用原来线程；</li>
+</ul>
+<h3 id="start和-run区别"><a href="#start和-run区别" class="headerlink" title="start和 run区别"></a><strong>start和 run区别</strong></h3><p><strong>方法内容不同：</strong>run称为线程体，它包含这个线程要执行的内容，run()方法运行结束，此线程终止，之后CPU再运行其它线程； Thread.start 方法启动一个线程，此线程是处于就绪状态并没有运行，<strong>生成thread</strong>放在cpu中调度，获取到时间片的线程执行run方法中具体的内容，start方法是真正实现多线程运行。</p>
+<h3 id="唤醒阻塞线程方式"><a href="#唤醒阻塞线程方式" class="headerlink" title="唤醒阻塞线程方式"></a><strong>唤醒阻塞线程方式</strong></h3><p><strong>1.wait与notify：</strong>wait与notify 配合synchronized使用，wait会立即释放锁，notify同步块执行完才释放</p>
+<p><strong>2.await与singal：</strong>Condition类提供，由 new ReentLock().newCondition() 获得Condition对象，与 wait和 notify相同，因为在使用 Lock锁后无法使用wait方法；</p>
+<p><strong>3.park与 unpark：</strong>LockSupport 是一个线程阻塞工具，可以在 线程任意位置让线程阻塞。和 Thread.suspenf()相比，它弥补了由于 resume() 在前发生，导致线程⽆法继续执行的情况。和Object.wait()相⽐，它不需要先获得某个对象的锁，也不会抛出 IException异常，可以唤醒指定线程。</p>
+<h3 id="CyclicBarrier和CountDownLatch区别"><a href="#CyclicBarrier和CountDownLatch区别" class="headerlink" title="CyclicBarrier和CountDownLatch区别"></a><strong>CyclicBarrier和CountDownLatch区别</strong></h3><p><strong>CountDownLatch:</strong>  减计数，当计算 &#x3D; 0时，释放所有等待线程； 计数为0后无法重置，不可重复利用； 调用countDown()方法则计数 -1，调用await()方法只进行阻塞；</p>
+<p><strong>CyclicBarrier:</strong>  加计数，当计数&#x3D;指定值时，释放所有等待线程；计数&#x3D;指定值，计数置为0重新开始，可重复利用； 调用await()方法计数+1， +1后 &lt; 指定值时，线程阻塞； </p>
+<p>1.CountDownLatch 是一个线程等待其他线程， CyclicBarrier多个线程互相等待。</p>
+<p>2.CountDownLatch  计数 -1 直到 0，CyclicBarrier 计算 +1，直到指定值。</p>
+<p>3.CountDownLatch 是一次性的， CyclicBarrier  可以循环利用。</p>
+<p><strong>CountDownLatch作用</strong></p>
+<p>允许一个或多个线程一直等待，直到 count&#x3D;0，唤醒所有线程。一个线程调用await() 时，阻塞当前线程。有线程调用一次 countDown() 时，计数 -1。当 count &#x3D; 0 时，被阻塞线程全部唤醒。</p>
+<p><strong>CyclicBarrier作用</strong></p>
+<p>一组线程互相等待，直到所有线程都到达一个同步点。例：一组运动员比赛 100米，当所有人都准备完成之后，才可以一起开跑。</p>
+<h3 id="Condition和wait-notify区别"><a href="#Condition和wait-notify区别" class="headerlink" title="Condition和wait&#x2F;notify区别"></a><strong>Condition和wait&#x2F;notify区别</strong></h3><p>1.Condition 可以精准的对多个不同条件进行控制，wait&#x2F;notify 只能和 synchronized关键字一起使用，只能唤醒一个或全部的等待队列；</p>
+<p>2.Condition 使用Lock进行控制，使用后要unlock()，Condition有类似于 await的机制，不会因为加锁而产生死锁问题，底层实现park&#x2F; unpark 机制，不会产生死锁，但wait&#x2F;notify可能会产生先唤醒再挂起的死锁。</p>
+<h4 id="Condition"><a href="#Condition" class="headerlink" title="Condition"></a><strong>Condition</strong></h4><p>Condition用来替代Object的 wait()，notify() 方法，使用Condition中await()，signal()可以更加安全，高效的实现线程间协作。 </p>
+<h3 id="wait-和sleep-区别"><a href="#wait-和sleep-区别" class="headerlink" title="wait()和sleep()区别"></a><strong>wait()和sleep()区别</strong></h3><p><strong>wait()方法：</strong>Object类的方法，当一个线程执行到wait方法时，它就进入到一个和该对象相关的等待池，同时释放对象的锁，使得其他线程能够访问，可以通过notify，notifyAll⽅法来唤醒等待的线程；</p>
+<p><strong>sleep()方法：</strong> 线程类（Thread）的静态方法，让调用线程进入睡眠状态，让出执行机会给其他线程，等到休眠时间结束后，线程进入就绪状态和 其他线程一起竞争cpu的执⾏时间。</p>
+<p><strong>总结：</strong>因为 sleep() 是 static静态方法，不能改变对象的锁，当一个 synchronized 块中调⽤ sleep()方法，线程虽然进入休眠，但是对象的锁没有被释放，其他线程依然无法访问这个对象。</p>
+<h3 id="线程五个状态"><a href="#线程五个状态" class="headerlink" title="线程五个状态"></a><strong>线程五个状态</strong></h3><p>创建、就绪、运⾏、阻塞、死亡</p>
+<p><strong>1.创建状态：</strong>生成线程对象，并没有调用该对象的 start方法，这是线程处于创建状态；</p>
+<p><strong>2.就绪状态：</strong>调用线程对象的 start方法后，进入就绪状态，没有获得时间片则不会执行，从等待或睡眠中醒来，也会处于就绪状态；</p>
+<p><strong>3.运行状态：</strong>线程调度程序将 就绪线程设置为当前线程，此时进入运行状态，开始运行 run()函数当中的代码。</p>
+<p><strong>4.阻塞状态：</strong>线程正在运行时被暂停，为等待某个事件的发生(资源就绪)之后再继续运行，sleep、suspend、wait等方法可以导致线程阻塞。</p>
+<p><strong>5.死亡状态：</strong>一个线程run()方法执行结束或调用stop()方法后，该线程就会死亡，对于死亡的线程，无法再使用start⽅法使其进入就绪。</p>
+<img src="https://p.ipic.vip/5ncdtg.png" alt="image-20250804211202010" style="zoom:60%;" />
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag"># 多线程</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/07/13/A3-%E7%BC%93%E5%AD%98/A3-%E7%BC%93%E5%AD%98%E6%89%A9%E5%B1%95%E5%B1%9E%E6%80%A7/" rel="prev" title="缓存扩展属性">
+                  <i class="fa fa-angle-left"></i> 缓存扩展属性
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2025/08/03/A4-%E5%A4%9A%E7%BA%BF%E7%A8%8B/A2-%E5%A4%9A%E7%A7%8D%E9%94%81/" rel="next" title="多种锁">
+                  多种锁 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC82MDYyOS8zNzEwMA=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">TurboCome</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/TurboCome" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script src="/js/third-party/comments/livere.js" defer></script>
+
+</body>
+</html>

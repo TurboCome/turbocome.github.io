@@ -22,7 +22,7 @@
     <meta name="description" content="String 结构具体结构：动态字符串，类型ArrayList，可以实现动态扩容 1.保存数据 size，能够根据当前空间大小判断，避免存储字符串遭遇截断； 2.空间预分配，实际存储一个对象，预先多分片free空间，避免频繁分配空间； 3.惰性空间删除，删除对象后，空间不会立刻回收，避免再次添加数据；">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis基本数据结构">
-<meta property="og:url" content="http://example.com/2025/06/15/A3-%E7%BC%93%E5%AD%98/Redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/index.html">
+<meta property="og:url" content="http://example.com/2025/06/15/A3-%E7%BC%93%E5%AD%98/A1-Redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/index.html">
 <meta property="og:site_name" content="TurboCome">
 <meta property="og:description" content="String 结构具体结构：动态字符串，类型ArrayList，可以实现动态扩容 1.保存数据 size，能够根据当前空间大小判断，避免存储字符串遭遇截断； 2.空间预分配，实际存储一个对象，预先多分片free空间，避免频繁分配空间； 3.惰性空间删除，删除对象后，空间不会立刻回收，避免再次添加数据；">
 <meta property="og:locale" content="zh_CN">
@@ -37,17 +37,17 @@
 <meta property="og:image" content="https://p.ipic.vip/cmkccc.png">
 <meta property="og:image" content="https://p.ipic.vip/w5bpkk.png">
 <meta property="article:published_time" content="2025-06-15T12:14:43.000Z">
-<meta property="article:modified_time" content="2025-07-13T12:36:47.853Z">
+<meta property="article:modified_time" content="2025-08-04T13:15:34.585Z">
 <meta property="article:author" content="TurboCome">
 <meta property="article:tag" content="Redis缓存">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://p.ipic.vip/bx0g3u.png">
 
 
-<link rel="canonical" href="http://example.com/2025/06/15/A3-%E7%BC%93%E5%AD%98/Redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
+<link rel="canonical" href="http://example.com/2025/06/15/A3-%E7%BC%93%E5%AD%98/A1-Redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/06/15/A3-%E7%BC%93%E5%AD%98/Redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/","path":"2025/06/15/A3-缓存/Redis数据结构/","title":"Redis基本数据结构"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/06/15/A3-%E7%BC%93%E5%AD%98/A1-Redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/","path":"2025/06/15/A3-缓存/A1-Redis数据结构/","title":"Redis基本数据结构"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>Redis基本数据结构 | TurboCome</title>
@@ -201,18 +201,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">17</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -250,7 +250,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2025/06/15/A3-%E7%BC%93%E5%AD%98/Redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/06/15/A3-%E7%BC%93%E5%AD%98/A1-Redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar/avatar.jpg">
@@ -433,7 +433,7 @@
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2025/06/19/A3-%E7%BC%93%E5%AD%98/Redis%E6%8C%81%E4%B9%85%E5%8C%96/" rel="next" title="Redis持久化&amp;集群">
+                <a href="/2025/06/19/A3-%E7%BC%93%E5%AD%98/A2-Redis%E6%8C%81%E4%B9%85%E5%8C%96/" rel="next" title="Redis持久化&amp;集群">
                   Redis持久化&集群 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
