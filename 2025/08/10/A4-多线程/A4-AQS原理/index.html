@@ -19,30 +19,37 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="BufferPool原理原理：对于数据的修改，Mysql不会直接去修改磁盘数据，这样做太慢了，Mysql会先记录 redo log，再改内存BufferPool，等空闲时再刷磁盘，查询时如果内存 BufferPool里没有数据就去磁盘 load； Mysql以16KB「页」为读取和写入单位，一「页」里有多行数据，写数据时，Mysql会先写内存中的页，然后再刷新到磁盘。">
+    <meta name="description" content="AbstractQueuedSynchronizer（AQS）应用场景：ReentrantLock、CountDownLatch 都是基于AQS实现 AQS实现原理 AQS维护了一个volatile int state（共享变量）； 一个 FIFO线程等待队列（多线程争用资源被阻塞时会进入此队列）；">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Mysql底层原理">
-<meta property="og:url" content="http://example.com/2025/05/11/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:title" content="AQS原理">
+<meta property="og:url" content="http://example.com/2025/08/10/A4-%E5%A4%9A%E7%BA%BF%E7%A8%8B/A4-AQS%E5%8E%9F%E7%90%86/index.html">
 <meta property="og:site_name" content="TurboCome">
-<meta property="og:description" content="BufferPool原理原理：对于数据的修改，Mysql不会直接去修改磁盘数据，这样做太慢了，Mysql会先记录 redo log，再改内存BufferPool，等空闲时再刷磁盘，查询时如果内存 BufferPool里没有数据就去磁盘 load； Mysql以16KB「页」为读取和写入单位，一「页」里有多行数据，写数据时，Mysql会先写内存中的页，然后再刷新到磁盘。">
+<meta property="og:description" content="AbstractQueuedSynchronizer（AQS）应用场景：ReentrantLock、CountDownLatch 都是基于AQS实现 AQS实现原理 AQS维护了一个volatile int state（共享变量）； 一个 FIFO线程等待队列（多线程争用资源被阻塞时会进入此队列）；">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://p.ipic.vip/iqax6b.png">
-<meta property="og:image" content="https://p.ipic.vip/q9g5dg.png">
-<meta property="article:published_time" content="2025-05-11T11:14:43.000Z">
-<meta property="article:modified_time" content="2025-05-25T11:16:19.975Z">
+<meta property="og:image" content="https://p.ipic.vip/zh07o0.png">
+<meta property="og:image" content="https://p.ipic.vip/i04nst.png">
+<meta property="og:image" content="https://p.ipic.vip/xr9ihc.png">
+<meta property="og:image" content="https://p.ipic.vip/ha7kib.png">
+<meta property="og:image" content="https://p.ipic.vip/3suuki.png">
+<meta property="og:image" content="https://p.ipic.vip/v00uds.png">
+<meta property="og:image" content="https://p.ipic.vip/3zg2fw.png">
+<meta property="og:image" content="http://example.com/Library/Application%20Support/typora-user-images/image-20250809111232588.png">
+<meta property="og:image" content="https://p.ipic.vip/p8xntx.png">
+<meta property="article:published_time" content="2025-08-10T12:38:43.000Z">
+<meta property="article:modified_time" content="2025-08-09T03:42:35.002Z">
 <meta property="article:author" content="TurboCome">
-<meta property="article:tag" content="Mysql">
+<meta property="article:tag" content="多线程">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://p.ipic.vip/iqax6b.png">
+<meta name="twitter:image" content="https://p.ipic.vip/zh07o0.png">
 
 
-<link rel="canonical" href="http://example.com/2025/05/11/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/">
+<link rel="canonical" href="http://example.com/2025/08/10/A4-%E5%A4%9A%E7%BA%BF%E7%A8%8B/A4-AQS%E5%8E%9F%E7%90%86/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/05/11/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/","path":"2025/05/11/A1-数据库/Mysql底层原理/","title":"Mysql底层原理"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/08/10/A4-%E5%A4%9A%E7%BA%BF%E7%A8%8B/A4-AQS%E5%8E%9F%E7%90%86/","path":"2025/08/10/A4-多线程/A4-AQS原理/","title":"AQS原理"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Mysql底层原理 | TurboCome</title>
+<title>AQS原理 | TurboCome</title>
   
 
   <script src="/js/third-party/analytics/baidu-analytics.js" defer></script>
@@ -178,7 +185,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#BufferPool%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">BufferPool原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ChangeBuffer%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">ChangeBuffer原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">2.1.</span> <span class="nav-text">使用场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Flush-purge%E8%BF%87%E7%A8%8B"><span class="nav-number">2.2.</span> <span class="nav-text">Flush &lt;–&gt; purge过程</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%A7%A6%E5%8F%91%E6%9D%A1%E4%BB%B6%EF%BC%9A"><span class="nav-number">2.2.1.</span> <span class="nav-text">触发条件：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Merge%E8%A7%A6%E5%8F%91%E6%9D%A1%E4%BB%B6"><span class="nav-number">2.2.2.</span> <span class="nav-text">Merge触发条件</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Mysql%E5%BA%95%E5%B1%82%E7%BB%93%E6%9E%84%E7%A4%BA%E6%84%8F%E5%9B%BE"><span class="nav-number">2.3.</span> <span class="nav-text">Mysql底层结构示意图</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DoublewriteBuffer%E5%8E%9F%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">DoublewriteBuffer原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mysql%E4%B8%AD%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8"><span class="nav-number">4.</span> <span class="nav-text">Mysql中数据存储</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#AbstractQueuedSynchronizer%EF%BC%88AQS%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">AbstractQueuedSynchronizer（AQS）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AQS%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="nav-number">1.1.</span> <span class="nav-text">AQS实现原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#state%E5%85%B1%E4%BA%AB%E5%8F%98%E9%87%8F"><span class="nav-number">1.2.</span> <span class="nav-text">state共享变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FIFO%E5%8F%8C%E5%90%91%E9%93%BE%E8%A1%A8%E9%98%9F%E5%88%97"><span class="nav-number">1.3.</span> <span class="nav-text">FIFO双向链表队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AQS%E8%B5%84%E6%BA%90%E5%85%B1%E4%BA%AB%E6%96%B9%E5%BC%8F"><span class="nav-number">1.4.</span> <span class="nav-text">AQS资源共享方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AQS%E5%86%85%E9%83%A8%E7%BB%93%E6%9E%84"><span class="nav-number">1.5.</span> <span class="nav-text">AQS内部结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AQS%E5%8A%A0%E9%94%81-%E9%87%8A%E6%94%BE%E9%94%81%E8%AF%A6%E7%BB%86%E8%BF%87%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">AQS加锁&amp;释放锁详细过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%BA%BF%E7%A8%8B1%E5%8A%A0%E9%94%81%E6%88%90%E5%8A%9F"><span class="nav-number">2.1.</span> <span class="nav-text">1.线程1加锁成功</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%BA%BF%E7%A8%8B2-3%E5%8A%A0%E9%94%81%E5%A4%B1%E8%B4%A5"><span class="nav-number">2.2.</span> <span class="nav-text">2.线程2&#x2F;3加锁失败</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E7%BA%BF%E7%A8%8B1%E9%87%8A%E6%94%BE%E9%94%81-%E7%BA%BF%E7%A8%8B2%E5%8A%A0%E9%94%81"><span class="nav-number">2.3.</span> <span class="nav-text">3.线程1释放锁&amp;线程2加锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Contition%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="nav-number">2.4.</span> <span class="nav-text">4.Contition实现原理</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -242,7 +249,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2025/05/11/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/08/10/A4-%E5%A4%9A%E7%BA%BF%E7%A8%8B/A4-AQS%E5%8E%9F%E7%90%86/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar/avatar.jpg">
@@ -255,12 +262,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="Mysql底层原理 | TurboCome">
+      <meta itemprop="name" content="AQS原理 | TurboCome">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Mysql底层原理
+          AQS原理
         </h1>
 
         <div class="post-meta-container">
@@ -271,7 +278,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2025-05-11 19:14:43" itemprop="dateCreated datePublished" datetime="2025-05-11T19:14:43+08:00">2025-05-11</time>
+      <time title="创建时间：2025-08-10 20:38:43" itemprop="dateCreated datePublished" datetime="2025-08-10T20:38:43+08:00">2025-08-10</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -279,7 +286,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
+          <a href="/categories/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">多线程</span></a>
         </span>
     </span>
 
@@ -300,42 +307,68 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h3 id="BufferPool原理"><a href="#BufferPool原理" class="headerlink" title="BufferPool原理"></a><strong>BufferPool原理</strong></h3><p><strong>原理：</strong>对于数据的修改，Mysql不会直接去修改磁盘数据，这样做太慢了，Mysql会先记录 redo log，再改内存BufferPool，等空闲时再刷磁盘，查询时如果内存 BufferPool里没有数据就去磁盘 load；</p>
-<p>Mysql以16KB「页」为读取和写入单位，一「页」里有多行数据，写数据时，Mysql会先写内存中的页，然后再刷新到磁盘。</p>
-<span id="more"></span>
-
-<p><strong>结构：</strong>BufferPool是以页(16kb)为元素的链表结构，基于LRU，和缓存一样，需要淘汰算法来管理数据；</p>
-<p><strong>持久化：</strong> 宕机时，BufferPool会丢失数据（在内存中），需要重做 redo log； 执行时先写redo log, 再写BufferPool。</p>
-<img src="https://p.ipic.vip/iqax6b.png" alt="image-20250511225327165" style="zoom:30%;" />
-
-<h3 id="ChangeBuffer原理"><a href="#ChangeBuffer原理" class="headerlink" title="ChangeBuffer原理"></a><strong>ChangeBuffer原理</strong></h3><p><strong>背景：</strong>Mysql查询数据时，如果内存里没有对应页的数据，会从磁盘里load；如果每次需要的页都不同（不是相邻的页），那每次都要去 load，效率会降低；</p>
-<p><strong>原理：</strong>更新一个数据页时，如果数据页在内存中，就直接更新；但如果这个数据页没在内存中，InooDB会将这些更新操作缓存在 <strong>change buffer中</strong>，这样就不需要从磁盘读入这个数据页。在下次<strong>查询需要</strong>访问这个数据页时，再将数据页读入内存，执行change buffer中与这个页有关的操作，通过这种方式就能保证数据逻辑的正确性。</p>
-<p><strong>使用条件：</strong>普通索引可以使用 Changebuffer，唯一索引（或主键）更新不能使用 change buffer，因为唯一索引更新操作要先判断这个操作 <strong>是否违反唯一性约束，</strong>判断表中是否存在这个数据，就必须要将数据页读入内存才能判断，已经读到内存中，直接更新内存会更快，就没必要使用change buffer。</p>
-<p><strong>关系：</strong>change buffer 是 buffer pool里的内存，不能无限增大；</p>
-<h4 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a><strong>使用场景</strong></h4><p><strong>适合：写多读少业务，</strong>在写完后马上被访问到的概率比较小，此时change buffer使用效果最好，业务模型常见：账单类，日志类的系统。</p>
-<p><strong>不适合：读多写少（写入后马上会做查询</strong>）将更新先记录在change buffer，但由于马上要访问这个数据页，会立即触发merge操作，访问IO次数不会减少，反而增加 change buffer维护代价。</p>
-<p>优劣：数据库进行 Merge 时，是真正进行 <strong>数据更新的时刻，</strong>change buffer目的就是将记录的变更动作缓存下来，所以在一个数据页做merge前，change buffer 记录变更数越多（页面要更新的数据越多），收益就越大。</p>
-<p>merge：ChangeBuffer –&gt; BufferPool</p>
-<p>purge（刷脏）: BufferPool –&gt; disk</p>
-<p><strong>脏页：</strong>在更新之前，当内存数据页跟磁盘数据页内容不一致的时候</p>
-<h4 id="Flush-purge过程"><a href="#Flush-purge过程" class="headerlink" title="Flush &lt;–&gt; purge过程"></a>Flush &lt;–&gt; purge过程</h4><p>将内存缓冲区BufferPool中的脏页写入磁盘，保障事务持久性</p>
-<h5 id="触发条件："><a href="#触发条件：" class="headerlink" title="触发条件："></a>触发条件：</h5><ul>
-<li>缓存池脏页比例超过阈值</li>
-<li>事务提交</li>
-<li>MySQL正常关闭，会把内存中的脏页都flush到磁盘上</li>
+    <div class="post-body" itemprop="articleBody"><h2 id="AbstractQueuedSynchronizer（AQS）"><a href="#AbstractQueuedSynchronizer（AQS）" class="headerlink" title="AbstractQueuedSynchronizer（AQS）"></a><strong>AbstractQueuedSynchronizer（AQS）</strong></h2><p>应用场景：ReentrantLock、CountDownLatch 都是基于AQS实现</p>
+<h3 id="AQS实现原理"><a href="#AQS实现原理" class="headerlink" title="AQS实现原理"></a><strong>AQS实现原理</strong></h3><ul>
+<li>AQS维护了一个volatile int state（共享变量）；</li>
+<li>一个 FIFO线程等待队列（多线程争用资源被阻塞时会进入此队列）；</li>
 </ul>
-<h5 id="Merge触发条件"><a href="#Merge触发条件" class="headerlink" title="Merge触发条件"></a>Merge触发条件</h5><ul>
-<li>访问这个数据页</li>
-<li>系统后台线程定期 merge</li>
-<li>数据库正常关闭（shutdown）过程中会执行merge</li>
-</ul>
-<h4 id="Mysql底层结构示意图"><a href="#Mysql底层结构示意图" class="headerlink" title="Mysql底层结构示意图"></a>Mysql底层结构示意图</h4><p><img src="https://p.ipic.vip/q9g5dg.png" alt="image-20250518112726769"></p>
-<h3 id="DoublewriteBuffer原理"><a href="#DoublewriteBuffer原理" class="headerlink" title="DoublewriteBuffer原理"></a><strong>DoublewriteBuffer原理</strong></h3><p>在purge操作之前，Mysql会先把数据写到另外一个地方 DoubleWrite Buffer，写完后再开始写磁盘；Doublewrite Buffer是一个备份，当发生 crash时可以利用它来修复磁盘数据。</p>
+<span id="more"></span> 
+
+<h3 id="state共享变量"><a href="#state共享变量" class="headerlink" title="state共享变量"></a>state共享变量</h3><p>由于是多线程共享变量，所以定义成 volatile，保证 state可见性，并通过 CAS来保证其并发修改的安全性。 初始化为0，多线程条件下线程要执行临界区代码，首先获取 state。 某个线程获取成功后 state +1，其他线程如果再想获取，将被阻塞到 FIFO等待队列中，等占有 state线程执行完，释放资源( state -1)后，会唤醒 FIFO中下一个等待的线程去获取 state。 </p>
+<h3 id="FIFO双向链表队列"><a href="#FIFO双向链表队列" class="headerlink" title="FIFO双向链表队列"></a><strong>FIFO双向链表队列</strong></h3><p>等待队列是一个双向链表，head 结点代表当前占用的线程，其他节点由于暂时获取不到锁，依次 <strong>排队等待锁的释放</strong>。</p>
+<img src="https://p.ipic.vip/zh07o0.png" alt="image-20250809105810378" style="zoom:30%;" />
+
+<h3 id="AQS资源共享方式"><a href="#AQS资源共享方式" class="headerlink" title="AQS资源共享方式"></a>AQS资源共享方式</h3><p><strong>1.Exclusive</strong>（独占）：只有一个线程执行，如ReentrantLock，可分为公平锁和非公平锁； </p>
 <ul>
-<li>刷数据之前宕机：内存—&gt; 磁盘，重做 redo log日志。</li>
-<li>刷数据时宕机：利用Doublewrite Buffer修复磁盘数据。</li>
+<li>公平锁：按照线程在队列中的排队顺序，先到者先得锁； </li>
+<li>非公平锁：获取锁时，无视队列顺序直接抢锁，谁抢到是谁的；</li>
 </ul>
-<h3 id="Mysql中数据存储"><a href="#Mysql中数据存储" class="headerlink" title="Mysql中数据存储"></a><strong>Mysql中数据存储</strong></h3><p>各个“数据页(16K)”组成一个 双向链表，每个 数据页中的记录又组成一个 单向链表。每个数据页都会为存储记录 生成<strong>页目录</strong>，一个数据页内：主键查找，二分法快速定位 ； 其他非主键列查找，从最小记录开始依次遍历单链表。</p>
+<p><strong>2.Share</strong>（共享）：多线程同时执行，如CountDownLatch；</p>
+<p>AQS内部维护一个线程的队列，队列由内部的节点组成。队列的节点分为SHARED和EXCLUSIVE分别为共享模式的节点和独占模式的节点。</p>
+<p>节点的等待状态为waitStatus：</p>
+<ul>
+<li>CANCELLED（1）：取消状态，当线程不再希望获取锁时，设置为取消状态；</li>
+<li>SIGNAL（-1）：当前节点的后继者处于等待状态，当前节点的线程如果释放或取消了同步状态，通知后继节点；</li>
+<li>CONDITION（-2）：等待队列的等待状态，当调用signal()时，进入同步队列；</li>
+<li>PROPAGATE（-3）：共享模式，同步状态的获取的可传播状态</li>
+<li>0：初始状态</li>
+</ul>
+<h3 id="AQS内部结构"><a href="#AQS内部结构" class="headerlink" title="AQS内部结构"></a><strong>AQS内部结构</strong></h3><p>为了维护等待在条件变量上的等待线程，AQS维护一个条件变量等待队列，由 Condition.await() 引起阻塞的线程。一个重入锁可以生成 多个条件变量对象，因此一个重入锁 可能有多个条件变量等待队列。每个条件变量对象内部都维护一个等待列表。 </p>
+<p>同步等待队列，条件变量等待队列都使用 同一个 Node类作为链表的节点；Node 中包括链表的上一个元素 prev，下一个元素next 和线程对象thread，对于条件变量等待队列，还使用nextWaiter表示下一个等待在条件变量队列中的节点。</p>
+<img src="https://p.ipic.vip/i04nst.png" alt="image-20250809110326188" style="zoom:33%;" />
+
+
+
+<h2 id="AQS加锁-释放锁详细过程"><a href="#AQS加锁-释放锁详细过程" class="headerlink" title="AQS加锁&amp;释放锁详细过程"></a>AQS加锁&amp;释放锁详细过程</h2><p>三个线程(线程1，2，3)同时来加锁&#x2F;释放锁；</p>
+<h3 id="1-线程1加锁成功"><a href="#1-线程1加锁成功" class="headerlink" title="1.线程1加锁成功"></a><strong>1.线程1加锁成功</strong></h3><p>如果同时有<strong>三个线程</strong>并发抢占锁，此时<strong>线程1</strong>抢占锁成功，<strong>线程2</strong>和<strong>线程3</strong>抢占锁失败，具体执行流程如下：</p>
+<img src="https://p.ipic.vip/xr9ihc.png" alt="image-20250809110442669" style="zoom:30%;" />
+
+<p>AQS的state &#x3D; 1，2&#x2F;3线程按照顺序放入等待队列FIFO；</p>
+<img src="https://p.ipic.vip/ha7kib.png" alt="image-20250809110609081" style="zoom:30%;" />
+
+<h3 id="2-线程2-3加锁失败"><a href="#2-线程2-3加锁失败" class="headerlink" title="2.线程2&#x2F;3加锁失败"></a><strong>2.线程2&#x2F;3加锁失败</strong></h3><p><strong>线程1</strong>将state修改为1，<strong>线程2</strong>通过 CAS修改state值不会成功，加锁失败。</p>
+<p><strong>线程2</strong>执行 tryAcquire()后会返回false，接着执行addWaiter(Node.EXCLUSIVE)逻辑，将自己加入到一个FIFO等待队列中。</p>
+<p>等待队列中的节点Node是一个<strong>双向链表</strong>；</p>
+<img src="https://p.ipic.vip/3suuki.png" alt="image-20250809110736529" style="zoom:30%;" />
+
+
+
+<h3 id="3-线程1释放锁-线程2加锁"><a href="#3-线程1释放锁-线程2加锁" class="headerlink" title="3.线程1释放锁&amp;线程2加锁"></a><strong>3.线程1释放锁&amp;线程2加锁</strong></h3><p><strong>线程1</strong>释放锁后会 <strong>唤醒head节点的后置节点</strong>，就是<strong>线程2。线程2</strong>设置为head节点，然后置空之前的head节点数据，被置空的节点数据会被<strong>垃圾回收</strong>。</p>
+<img src="https://p.ipic.vip/v00uds.png" alt="image-20250809110858805" style="zoom:33%;" />
+
+
+
+<h3 id="4-Contition实现原理"><a href="#4-Contition实现原理" class="headerlink" title="4.Contition实现原理"></a>4.<strong>Contition实现原理</strong></h3><p>await()方法首先调用 addConditionWaiter()将当前线程加入到Condition队列。这里会用当前线程创建一个 Node节点，waitStatus为CONDITION。 接着会释放该节点的锁，调用之前解析过的release()方法，释放锁之后，会唤醒被挂起的<strong>线程2</strong>，<strong>线程2</strong>会继续尝试获取锁。</p>
+<img src="https://p.ipic.vip/3zg2fw.png" alt="image-20250809111112517" style="zoom:30%;" />
+
+
+
+<p>接着判断当前节点是否为 Condition队列中的头部节点，如果是则挂起 Condition中当前线程。此时<strong>线程1</strong>被挂起，<strong>线程2</strong>获取锁成功。<strong>线程2</strong>执行signal()方法，如果<strong>线程2</strong>已经获取到锁，此时AQS等待队列中已经没有数据。</p>
+<img src="../../../../../Library/Application%20Support/typora-user-images/image-20250809111232588.png" alt="image-20250809111232588" style="zoom:33%;" />
+
+<p>Condition队列中只有线程1 创建的一个Node节点，且waitStatue为CONDITION，先通过CAS修改当前节点waitStatus为0，然后执行enq()方法将当前线程加入到等待队列中，并返回当前线程的前置节点，接着开始通过CAS修改当前节点的前置节点waitStatus为SIGNAL，并且唤醒当前线程。等<strong>线程二</strong>释放锁后，<strong>线程一</strong>会继续重试获取锁，结束。此时等待队列中数据如下图：</p>
+<img src="https://p.ipic.vip/p8xntx.png" alt="image-20250809111505150" style="zoom:30%;" />
+
 
     </div>
 
@@ -345,20 +378,20 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Mysql/" rel="tag"># Mysql</a>
+              <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag"># 多线程</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2025/05/05/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E4%BA%8B%E5%8A%A1/" rel="prev" title="Mysql事务">
-                  <i class="fa fa-angle-left"></i> Mysql事务
+                <a href="/2025/08/09/A4-%E5%A4%9A%E7%BA%BF%E7%A8%8B/A3-ThreadLocal%E5%8E%9F%E7%90%86/" rel="prev" title="ThreadLocal原理">
+                  <i class="fa fa-angle-left"></i> ThreadLocal原理
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2025/05/18/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/" rel="next" title="Mysql查询优化">
-                  Mysql查询优化 <i class="fa fa-angle-right"></i>
+                <a href="/2025/08/10/A4-%E5%A4%9A%E7%BA%BF%E7%A8%8B/A5-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%A1%88%E4%BE%8B/" rel="next" title="多线程编程实践">
+                  多线程编程实践 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
           </div>
