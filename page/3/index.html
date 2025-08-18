@@ -19,31 +19,24 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="主从复制异步过程1.Mysql主库在收到客户端提交事务的请求后，先写bin log，然后再提交事务，更新数据； 2.事务提交完成后，给客户端返回操作成功的响应。此时从库会启动一个复制 IO线程，从主库接收 binlog； 3.把binlog 写到一个中继日志里，再给主库返回一个复制成功的响应； 4.从库有一个 SQL线程，去读中继日志，回放 binlog内容，以此实现数据的同步；">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Mysql主从架构">
-<meta property="og:url" content="http://example.com/2025/05/19/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E4%B8%BB%E4%BB%8E%E6%9E%B6%E6%9E%84/index.html">
+    <meta name="description" content="学而不思则罔，思而不学则殆！">
+<meta property="og:type" content="website">
+<meta property="og:title" content="TurboCome">
+<meta property="og:url" content="http://example.com/page/3/index.html">
 <meta property="og:site_name" content="TurboCome">
-<meta property="og:description" content="主从复制异步过程1.Mysql主库在收到客户端提交事务的请求后，先写bin log，然后再提交事务，更新数据； 2.事务提交完成后，给客户端返回操作成功的响应。此时从库会启动一个复制 IO线程，从主库接收 binlog； 3.把binlog 写到一个中继日志里，再给主库返回一个复制成功的响应； 4.从库有一个 SQL线程，去读中继日志，回放 binlog内容，以此实现数据的同步；">
+<meta property="og:description" content="学而不思则罔，思而不学则殆！">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://p.ipic.vip/jm71qa.png">
-<meta property="og:image" content="https://p.ipic.vip/4gjrda.png">
-<meta property="og:image" content="https://p.ipic.vip/3nniqg.png">
-<meta property="article:published_time" content="2025-05-19T11:14:43.000Z">
-<meta property="article:modified_time" content="2025-05-25T11:16:32.577Z">
 <meta property="article:author" content="TurboCome">
-<meta property="article:tag" content="Mysql">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://p.ipic.vip/jm71qa.png">
 
 
-<link rel="canonical" href="http://example.com/2025/05/19/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E4%B8%BB%E4%BB%8E%E6%9E%B6%E6%9E%84/">
+<link rel="canonical" href="http://example.com/page/3/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/05/19/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E4%B8%BB%E4%BB%8E%E6%9E%B6%E6%9E%84/","path":"2025/05/19/A1-数据库/Mysql主从架构/","title":"Mysql主从架构"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"page/3/index.html","title":""}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Mysql主从架构 | TurboCome</title>
+<title>TurboCome - 淡泊明志，宁静致远！</title>
   
 
   <script src="/js/third-party/analytics/baidu-analytics.js" defer></script>
@@ -112,7 +105,7 @@
 
     <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
-      <p class="site-title">TurboCome</p>
+      <h1 class="site-title">TurboCome</h1>
       <i class="logo-line"></i>
     </a>
       <p class="site-subtitle" itemprop="description">淡泊明志，宁静致远！</p>
@@ -166,7 +159,7 @@
   
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+    <div class="sidebar-inner sidebar-overview-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -179,7 +172,6 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%BC%82%E6%AD%A5%E8%BF%87%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">主从复制异步过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="nav-number">1.1.</span> <span class="nav-text">总结：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mysql%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">Mysql主从复制类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E5%BC%82%E6%AD%A5%E5%A4%8D%E5%88%B6"><span class="nav-number">2.1.</span> <span class="nav-text">1.异步复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6"><span class="nav-number">2.2.</span> <span class="nav-text">2.半同步复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%A2%9E%E5%BC%BA%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6"><span class="nav-number">2.3.</span> <span class="nav-text">3.增强半同步复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E5%85%A8%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6"><span class="nav-number">2.4.</span> <span class="nav-text">4.全同步复制</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%8A%E5%90%8C%E6%AD%A5-%E5%A2%9E%E5%BC%BA%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%8C%BA%E5%88%AB"><span class="nav-number">3.</span> <span class="nav-text">半同步&amp;增强半同步区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB"><span class="nav-number">4.</span> <span class="nav-text">读写分离</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E6%8F%90%E9%AB%98%E6%80%A7%E8%83%BD%E5%8E%9F%E5%9B%A0"><span class="nav-number">4.1.</span> <span class="nav-text">读写分离提高性能原因</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E6%9C%BA%E5%AE%95%E6%9C%BA%E6%81%A2%E5%A4%8D%E6%9C%BA%E5%88%B6"><span class="nav-number">5.</span> <span class="nav-text">主机宕机恢复机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Mysql%E9%9B%86%E7%BE%A4%E9%85%8D%E7%BD%AE"><span class="nav-number">5.1.</span> <span class="nav-text">Mysql集群配置</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -232,18 +224,17 @@
 
     </div>
 
-    <div class="main-inner post posts-expand">
+    <div class="main-inner index posts-expand">
 
-
-  
+    
 
 
 <div class="post-block">
   
   
 
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2025/05/19/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E4%B8%BB%E4%BB%8E%E6%9E%B6%E6%9E%84/">
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/05/02/%E6%96%B9%E6%B3%95%E8%AE%BA/%E8%81%8C%E5%9C%BA%E6%B1%87%E6%8A%A5%E6%96%B9%E6%B3%95%E8%AE%BA/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar/avatar.jpg">
@@ -256,13 +247,13 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="Mysql主从架构 | TurboCome">
+      <meta itemprop="name" content=" | TurboCome">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Mysql主从架构
-        </h1>
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2025/05/02/%E6%96%B9%E6%B3%95%E8%AE%BA/%E8%81%8C%E5%9C%BA%E6%B1%87%E6%8A%A5%E6%96%B9%E6%B3%95%E8%AE%BA/" class="post-title-link" itemprop="url">职场工作</a>
+        </h2>
 
         <div class="post-meta-container">
           <div class="post-meta">
@@ -272,7 +263,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2025-05-19 19:14:43" itemprop="dateCreated datePublished" datetime="2025-05-19T19:14:43+08:00">2025-05-19</time>
+      <time title="创建时间：2025-05-02 23:43:43" itemprop="dateCreated datePublished" datetime="2025-05-02T23:43:43+08:00">2025-05-02</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -280,18 +271,15 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
+          <a href="/categories/%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">学习</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0/%E8%81%8C%E5%9C%BA%E6%B1%87%E6%8A%A5%E6%96%B9%E6%B3%95%E8%AE%BA/" itemprop="url" rel="index"><span itemprop="name">职场汇报方法论</span></a>
         </span>
     </span>
 
   
-    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
-      <span class="post-meta-item-icon">
-        <i class="eye"></i>
-      </span>
-      <span class="post-meta-item-text">阅读次数：</span>
-      <span id="busuanzi_value_page_pv"></span>
-    </span>
 </div>
 
           
@@ -301,49 +289,21 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h3 id="主从复制异步过程"><a href="#主从复制异步过程" class="headerlink" title="主从复制异步过程"></a>主从复制异步过程</h3><p>1.Mysql主库在收到客户端提交事务的请求后，先写bin log，然后再提交事务，更新数据；</p>
-<p>2.事务提交完成后，给客户端返回操作成功的响应。此时从库会启动一个复制 IO线程，从主库接收 binlog；</p>
-<p>3.把binlog 写到一个中继日志里，再给主库返回一个复制成功的响应；</p>
-<p>4.从库有一个 SQL线程，去读中继日志，回放 binlog内容，以此实现数据的同步； </p>
-<span id="more"></span>
-
-<h4 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h4><p>异步复制时：主库提交事务之后，就会给客户端返回响应。</p>
-<p>同步复制时：主库在提交事务时，会等待数据复制到所有从库之后，再给客户端返回响应。</p>
-<p><img src="https://p.ipic.vip/jm71qa.png" alt="image-20250518163722159"></p>
-<h3 id="Mysql主从复制类型"><a href="#Mysql主从复制类型" class="headerlink" title="Mysql主从复制类型"></a>Mysql主从复制类型</h3><h4 id="1-异步复制"><a href="#1-异步复制" class="headerlink" title="1.异步复制"></a><strong>1.异步复制</strong></h4><p>主库执行完提交的事务后，立即将结果返给客户端，并不关心从库是否已经接收并处理。如果主宕机了，此时主上已经提交的事务可能并没有传到从库上，此时强行将从库提升为主库，就可能导致新主上的数据不完整。</p>
-<h4 id="2-半同步复制"><a href="#2-半同步复制" class="headerlink" title="2.半同步复制"></a><strong>2.半同步复制</strong></h4><p>主库执行完客户端提交的事务后，不会立刻返回给客户端，而是等待 <strong>至少一个从库接收到bin log日志后才返回给客户端</strong>。半同步复制提高了数据的安全性，同时也造成了一定程度的延迟，这个延迟最少是一个TCP&#x2F;IP往返的时间，所以，半同步复制最好在低延时的网络中使用。</p>
-<h4 id="3-增强半同步复制"><a href="#3-增强半同步复制" class="headerlink" title="3.增强半同步复制"></a>3.增强半同步复制</h4><p>增强半同步复制，是mysql 5.7.2后的版本，对半同步复制做的一个改进，原理上几乎是一样的，主要解决幻读的问题。主库在存储引擎 <strong>提交事务前，必须先收到从库数据同步完成的确认信息</strong>，才能提交事务，以此来解决幻读问题。</p>
-<h4 id="4-全同步复制"><a href="#4-全同步复制" class="headerlink" title="4.全同步复制"></a><strong>4.全同步复制</strong></h4><p>当主库执行完一个事务，所有从库都执行该事务后，主库才返回给客户端。需要等待所有从库执行完该事务，才能返回，全同步复制的性能必然会受到严重的影响。</p>
-<h3 id="半同步-增强半同步区别"><a href="#半同步-增强半同步区别" class="headerlink" title="半同步&amp;增强半同步区别"></a>半同步&amp;增强半同步区别</h3><p><strong>半同步：</strong>等待ACK的点是Commit之后，此时Master已经完成数据变更，用户已经可以看到最新数据，但binlog还未同步到Slave时，发生主从切换后，此时从库是没有这个最新数据的，用户看到的是老数据。</p>
-<p><strong>增强半同步：</strong>将等待ACK的点放在提交Commit之前，此时数据还未被提交，外界看不到数据变更，此时如果发送主从切换，新库依然还是老数据，不存在数据不一致的问题。</p>
-<p>总结：等待slave 已经同步完数据，再做commit提交！主库提交事务的时间点是有差别的。</p>
-<img src="https://p.ipic.vip/4gjrda.png" alt="img"  />
-
-
-
-<h3 id="读写分离"><a href="#读写分离" class="headerlink" title="读写分离"></a>读写分离</h3><ul>
-<li>主服务器：写 +  读 （实时性要求高） </li>
-<li>从服务器：读</li>
-</ul>
-<h4 id="读写分离提高性能原因"><a href="#读写分离提高性能原因" class="headerlink" title="读写分离提高性能原因"></a>读写分离提高性能原因</h4><p>1.主从服务器负责各自的 读和写，缓解了锁的竞争；</p>
-<p>2.从服务器可以使用 Myisam引擎，提升查询性能，以及节约系统开销；</p>
-<h3 id="主机宕机恢复机制"><a href="#主机宕机恢复机制" class="headerlink" title="主机宕机恢复机制"></a><strong>主机宕机恢复机制</strong></h3><p>1.确保所有从节点 <strong>relay log全部更新完毕（</strong>数据都已同步完），在每个从库上执行 show processlist 查看。</p>
-<p>2.登录所有从节点，查看 master.info文件， 找<strong>最大的  pos节点作为新主库，数据最全。</strong></p>
-<p>3.登录 pos最大从节点，执行 stop slave，<strong>删</strong> <strong>relay-log.info</strong> <strong>等相关文件，</strong>开启 bin-log来记录sql 日志；执行 reset master。</p>
-<p>4.创建用于<strong>同步的用户，并授权slave。</strong></p>
-<p>5.登录其他从节点，执行 stop slave停止同步，再<strong>执行 start slave。</strong></p>
-<p>6.测试 新master 和 slave 数据是否同步。</p>
-<p>参考：<a target="_blank" rel="noopener" href="https://zq99299.github.io/note-book/back-end-storage/02/06.html#%E5%A6%82%E4%BD%95%E9%85%8D%E7%BD%AE-mysql-%E7%9A%84%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5">MySQL主从同步参考</a></p>
-<h4 id="Mysql集群配置"><a href="#Mysql集群配置" class="headerlink" title="Mysql集群配置"></a>Mysql集群配置</h4><p>单库性能极限：1W TPS</p>
-<p>100库性能极限：100W TPS</p>
-<p>实际Mysql集群部署情况：1主5从双机房，单机房3个实例，在大型互联网公司会以这种集群部署方式来部署Mysql集群。</p>
-<img src="https://p.ipic.vip/3nniqg.png" alt="image-20250518164016734" style="zoom:50%;" />
-
-
-
-
-
-
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="接受工作–只问标准"><a href="#接受工作–只问标准" class="headerlink" title="接受工作–只问标准"></a>接受工作–只问标准</h3><p>*具体化</p>
+<p>*可衡量</p>
+<p>*可实现</p>
+<p>*相关性</p>
+<p>*有时限</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/05/02/%E6%96%B9%E6%B3%95%E8%AE%BA/%E8%81%8C%E5%9C%BA%E6%B1%87%E6%8A%A5%E6%96%B9%E6%B3%95%E8%AE%BA/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
     </div>
 
     
@@ -351,24 +311,8 @@
     
 
     <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/Mysql/" rel="tag"># Mysql</a>
-          </div>
-
-        
-
-          <div class="post-nav">
-            <div class="post-nav-item">
-                <a href="/2025/05/18/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/" rel="prev" title="Mysql查询优化">
-                  <i class="fa fa-angle-left"></i> Mysql查询优化
-                </a>
-            </div>
-            <div class="post-nav-item">
-                <a href="/2025/05/20/A1-%E6%95%B0%E6%8D%AE%E5%BA%93/Mysql%E4%BC%98%E5%8C%96%E5%AE%9E%E8%B7%B5/" rel="next" title="Mysql优化实践">
-                  Mysql优化实践 <i class="fa fa-angle-right"></i>
-                </a>
-            </div>
-          </div>
+        <div class="post-eof"></div>
+      
     </footer>
   </article>
 </div>
@@ -376,9 +320,10 @@
 
 
 
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+  </nav>
 
-
-    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC82MDYyOS8zNzEwMA=="></div>
 </div>
   </main>
 
