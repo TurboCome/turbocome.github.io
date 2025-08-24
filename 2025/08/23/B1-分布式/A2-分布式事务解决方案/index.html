@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha256-dABdfBfUoC8vJUBOwGVdm8L9qlMWaHTIfXt+7GnZCIo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="分布式事务背景电商订单支付业务中订单支付后，需要做的事情：  更改订单状态 扣减商品库存 给会员增加积分 创建销售出库单通知仓库发货">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式事务解决方案">
+<meta property="og:url" content="http://example.com/2025/08/23/B1-%E5%88%86%E5%B8%83%E5%BC%8F/A2-%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/index.html">
+<meta property="og:site_name" content="TurboCome">
+<meta property="og:description" content="分布式事务背景电商订单支付业务中订单支付后，需要做的事情：  更改订单状态 扣减商品库存 给会员增加积分 创建销售出库单通知仓库发货">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://p.ipic.vip/kd4cld.png">
+<meta property="og:image" content="https://p.ipic.vip/bxum4h.png">
+<meta property="og:image" content="https://p.ipic.vip/jtmcep.png">
+<meta property="og:image" content="https://p.ipic.vip/ohcj5j.png">
+<meta property="og:image" content="https://p.ipic.vip/tyck6r.png">
+<meta property="og:image" content="https://p.ipic.vip/442s96.png">
+<meta property="article:published_time" content="2025-08-23T11:38:43.000Z">
+<meta property="article:modified_time" content="2025-08-24T03:47:53.787Z">
+<meta property="article:author" content="TurboCome">
+<meta property="article:tag" content="分布式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://p.ipic.vip/kd4cld.png">
+
+
+<link rel="canonical" href="http://example.com/2025/08/23/B1-%E5%88%86%E5%B8%83%E5%BC%8F/A2-%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/08/23/B1-%E5%88%86%E5%B8%83%E5%BC%8F/A2-%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/","path":"2025/08/23/B1-分布式/A2-分布式事务解决方案/","title":"分布式事务解决方案"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>分布式事务解决方案 | TurboCome</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js" defer></script>
+  <script async src="https://hm.baidu.com/hm.js?dbd38ecdd37e06f1e9b027fc0fbc8e2e"></script>
+
+
+
+
+
+
+
+  
+  <script size="" alpha="" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/src/fireworks.js"></script>
+
+
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">TurboCome</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">淡泊明志，宁静致远！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">分布式事务背景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%B5%E5%95%86%E8%AE%A2%E5%8D%95%E6%94%AF%E4%BB%98%E4%B8%9A%E5%8A%A1%E4%B8%AD"><span class="nav-number">1.1.</span> <span class="nav-text">电商订单支付业务中</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81TCC%E4%B8%89%E9%98%B6%E6%AE%B5%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B"><span class="nav-number">1.2.</span> <span class="nav-text">一、TCC三阶段执行过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Try%E9%98%B6%E6%AE%B5"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.Try阶段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Confirm%E9%98%B6%E6%AE%B5"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.Confirm阶段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-Cancel%E9%98%B6%E6%AE%B5"><span class="nav-number">1.2.3.</span> <span class="nav-text">3.Cancel阶段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCC%E8%BF%87%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="nav-number">1.2.4.</span> <span class="nav-text">TCC过程总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCC%E8%BF%87%E7%A8%8B%E4%B8%AD%E7%9A%84%E5%BC%82%E5%B8%B8%E6%83%85%E5%86%B5"><span class="nav-number">1.2.5.</span> <span class="nav-text">TCC过程中的异常情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCC%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.2.6.</span> <span class="nav-text">TCC适用场景</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%8F%AF%E9%9D%A0%E6%B6%88%E6%81%AF%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7%E6%96%B9%E6%A1%88"><span class="nav-number">1.3.</span> <span class="nav-text">二、可靠消息最终一致性方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B"><span class="nav-number">1.3.1.</span> <span class="nav-text">基本流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E7%82%B9"><span class="nav-number">1.3.2.</span> <span class="nav-text">关键点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%9D%E8%AF%81%E4%B8%8A%E6%B8%B8%E6%9C%8D%E5%8A%A1%E5%AF%B9%E6%B6%88%E6%81%AF-100-%E5%8F%AF%E9%9D%A0%E6%8A%95%E9%80%92"><span class="nav-number">1.3.3.</span> <span class="nav-text">保证上游服务对消息 100% 可靠投递</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%9D%E8%AF%81%E4%B8%8B%E6%B8%B8%E6%9C%8D%E5%8A%A1%E5%AF%B9%E6%B6%88%E6%81%AF-100-%E5%8F%AF%E9%9D%A0%E6%8E%A5%E6%94%B6"><span class="nav-number">1.3.4.</span> <span class="nav-text">保证下游服务对消息 100% 可靠接收</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8EK-V%E5%AD%98%E5%82%A8%E9%98%9F%E5%88%97%E7%9A%84%E9%AB%98%E5%8F%AF%E7%94%A8%E9%99%8D%E7%BA%A7%E6%96%B9%E6%A1%88"><span class="nav-number">1.4.</span> <span class="nav-text">基于K-V存储队列的高可用降级方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87"><span class="nav-number">1.5.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.6.</span> <span class="nav-text">使用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88"><span class="nav-number">1.7.</span> <span class="nav-text">实现方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E6%B8%B8%E6%9C%8D%E5%8A%A1%E6%B6%88%E8%B4%B9-MQ-%E7%9A%84%E9%99%8D%E7%BA%A7%E6%84%9F%E7%9F%A5"><span class="nav-number">1.8.</span> <span class="nav-text">下游服务消费 MQ 的降级感知</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%85%E9%9A%9C%E7%9A%84%E8%87%AA%E5%8A%A8%E6%81%A2%E5%A4%8D"><span class="nav-number">1.9.</span> <span class="nav-text">故障的自动恢复</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="TurboCome"
+      src="/images/avatar/avatar.jpg">
+  <p class="site-author-name" itemprop="name">TurboCome</p>
+  <div class="site-description" itemprop="description">学而不思则罔，思而不学则殆！</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/TurboCome" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;TurboCome" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:turbocome@gmail.com" title="E-Mail → mailto:turbocome@gmail.com" rel="noopener me" target="_blank"><i class="fab fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/6161857964" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;6161857964" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/08/23/B1-%E5%88%86%E5%B8%83%E5%BC%8F/A2-%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar/avatar.jpg">
+      <meta itemprop="name" content="TurboCome">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TurboCome">
+      <meta itemprop="description" content="学而不思则罔，思而不学则殆！">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="分布式事务解决方案 | TurboCome">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          分布式事务解决方案
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-08-23 19:38:43" itemprop="dateCreated datePublished" datetime="2025-08-23T19:38:43+08:00">2025-08-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+          
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="分布式事务背景"><a href="#分布式事务背景" class="headerlink" title="分布式事务背景"></a>分布式事务背景</h2><h3 id="电商订单支付业务中"><a href="#电商订单支付业务中" class="headerlink" title="电商订单支付业务中"></a>电商订单支付业务中</h3><p>订单支付后，需要做的事情：</p>
+<ul>
+<li>更改订单状态</li>
+<li>扣减商品库存</li>
+<li>给会员增加积分</li>
+<li>创建销售出库单通知仓库发货</li>
+</ul>
+<span id="more"></span> 
+
+<p>目标：保证要么一起成功、要么一起失败！</p>
+<img src="https://p.ipic.vip/kd4cld.png" alt="image-20250824111545396" style="zoom:43%;" />
+
+<h3 id="一、TCC三阶段执行过程"><a href="#一、TCC三阶段执行过程" class="headerlink" title="一、TCC三阶段执行过程"></a>一、TCC三阶段执行过程</h3><h4 id="1-Try阶段"><a href="#1-Try阶段" class="headerlink" title="1.Try阶段"></a>1.Try阶段</h4><p>锁定某个资源，设置一个预备的状态，冻结部分数据</p>
+<p>orderDAO.updateStatus(OrderStatus.PAYING);    预备状态-支付中</p>
+<h4 id="2-Confirm阶段"><a href="#2-Confirm阶段" class="headerlink" title="2.Confirm阶段"></a>2.Confirm阶段</h4><p>一旦订单服务里面 TCC 分布式事务框架感知到各个服务的 Try 阶段都成功以后，会执行各个服务的Confirm 逻辑；在订单服务里加入一个 Confirm 逻辑，正式把订单的状态设置为“已支付”；</p>
+<p>orderDao.updateStatus(OrderStatus.PAYED);</p>
+<p>订单服务内的 TCC 事务框架会负责跟其他各个服务内的 TCC 事务框架进行通信，依次调用各个服务的 Confirm 逻辑，然后正式完成各个服务的所有业务逻辑的执行。</p>
+<img src="https://p.ipic.vip/bxum4h.png" alt="image-20250824111750742" style="zoom:40%;" />
+
+<h4 id="3-Cancel阶段"><a href="#3-Cancel阶段" class="headerlink" title="3.Cancel阶段"></a><strong>3.Cancel阶段</strong></h4><p>在 Try阶段，如果积分服务执行出错，那订单服务内的 TCC 事务框架是可以感知到的，然后会决定对整个 TCC 分布式事务进行回滚，会执行各个服务的第二个 C 阶段：Cancel 阶段。</p>
+<img src="https://p.ipic.vip/jtmcep.png" alt="image-20250824111903424" style="zoom:40%;" />
+
+<h4 id="TCC过程总结"><a href="#TCC过程总结" class="headerlink" title="TCC过程总结"></a>TCC过程总结</h4><p>Try-Confirm-Cancel</p>
+<p>1.先是服务调用链路，各个子服务依次执行 Try 逻辑；</p>
+<p>2.如果都正常，TCC 分布式事务框架推进执行 Confirm 逻辑，完成整个事务；</p>
+<p>3.如果某个服务Try 逻辑有问题，TCC 分布式事务框架感知到后，就会推进执行各个服务Cancel逻辑，撤销之前执行的各种操作；</p>
+<h4 id="TCC过程中的异常情况"><a href="#TCC过程中的异常情况" class="headerlink" title="TCC过程中的异常情况"></a>TCC过程中的异常情况</h4><p>1.如果有意外情况发生，如订单服务突然挂了，再次重启，如何保证之前没执行完的分布式事务继续执行？</p>
+<p><strong>解决：</strong>TCC事务框架都是要记录一些分布式事务的活动日志，可以在磁盘上的日志文件里记录（数据库里记录）。保存下来分布式事务运行的各个阶段和状态。</p>
+<p>2.如果某个服务 Cancel 或 Confirm 逻辑执行一直失败怎么办？</p>
+<p>解决：TCC 事务框架会通过活动日志记录各个服务状态。例如：某个服务Cancel 或 Confirm 一直没成功，会不停的重试调用它的 Cancel 或Confirm 逻辑，务必要它成功！  </p>
+<p><strong>兜底：</strong>重试多次失败，将执行失败的订单记录到重试表中，通过task定时任务指定时间重试失败的任务；</p>
+<h4 id="TCC适用场景"><a href="#TCC适用场景" class="headerlink" title="TCC适用场景"></a><strong>TCC适用场景</strong></h4><p>大部分接口调用是同步的，就是一个服务直接调用另外一个服务接口。这个时候用 TCC 分布式事务方案来保证各个接口的调用，要么一起成功，要么一起回滚，是比较合适的。</p>
+<img src="https://p.ipic.vip/ohcj5j.png" alt="image-20250824112129752" style="zoom:40%;" />
+
+
+
+<h3 id="二、可靠消息最终一致性方案"><a href="#二、可靠消息最终一致性方案" class="headerlink" title="二、可靠消息最终一致性方案"></a>二、可靠消息最终一致性方案</h3><p><strong>背景：</strong>一个服务从 MQ 消费到一条消息后进行处理，这就成了基于 MQ 的异步调用。针对这种基于 MQ 的异步调用，如何保证各个服务间的分布式事务呢？ — 可靠消息最终一致性方案；</p>
+<img src="https://p.ipic.vip/tyck6r.png" alt="image-20250824112700317" style="zoom:30%;" />
+
+<h4 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a>基本流程</h4><p>1.上游服务需要发送一条消息给 <strong>“可靠消息服务”</strong>，包含一些请求参数；</p>
+<p>2.可靠消息服务把这条消息存储到自己的数据库，更新状态为“待确认”；</p>
+<p>3.上游服务执行自己本地的数据库操作，根据自己的执行结果，再次调用可靠消息服务的接口；</p>
+<ul>
+<li>本地数据库执行成功 –&gt;确认消息</li>
+<li>本地数据库执行失败 –&gt;删除消息</li>
+</ul>
+<p>4.如果是确认消息，可靠消息服务就把数据库里的消息状态更新为“已发送”，同时将消息发送给 MQ；</p>
+<p>5.下游服务接收到消息，操作自己本地数据库，如果操作成功就通知可靠消息服务处理成功，可靠消息服务就会把消息状态设置为“已完成”。</p>
+<h4 id="关键点"><a href="#关键点" class="headerlink" title="关键点"></a>关键点</h4><p>1.更新数据库里的消息状态和投递消息到 MQ，这2个操作需要放在一个方法里，且开启本地事务。</p>
+<p>2.如果数据库里更新消息的状态失败，那么就抛异常退出，就不用投递 MQ；</p>
+<p>3.如果投递 MQ 失败报错，就抛异常让本地数据库事务回滚，这2个操作必须一起成功，或者一起失败。</p>
+<h4 id="保证上游服务对消息-100-可靠投递"><a href="#保证上游服务对消息-100-可靠投递" class="headerlink" title="保证上游服务对消息 100% 可靠投递"></a><strong>保证上游服务对消息 100% 可靠投递</strong></h4><p><strong>场景：</strong>如果上游服务操作完本地数据库后，通知可靠消息服务确认消息或删除消息时，出现问题没通知成功，或没执行成功，或可靠消息服务没成功投递消息到 MQ 要怎么办？</p>
+<p>消息在可靠消息服务的数据库里状态是“待确认”，此时在可靠消息服务里开发一个后台定时运行的线程，不停的检查各个消息的状态。如果一直是“待确认”状态，就认为这个消息出现问题。此时就可以回调上游服务提供的接口，确认这个消息对应的数据库操作是否执行成功？</p>
+<ul>
+<li>如果上游服务回答执行成功，那么可靠消息服务将消息状态修改为“已发送”，同时投递消息到 MQ；</li>
+<li>如果上游服务回答没执行成功，那么可靠消息服务将数据库中的消息删除即可；</li>
+</ul>
+<h4 id="保证下游服务对消息-100-可靠接收"><a href="#保证下游服务对消息-100-可靠接收" class="headerlink" title="保证下游服务对消息 100% 可靠接收"></a><strong>保证下游服务对消息 100% 可靠接收</strong></h4><p><strong>场景：</strong>下游服务消费消息出了问题，或没消费到？或下游服务对消息的处理失败？</p>
+<p>可靠消息服务里开发一个后台线程，不断的检查消息状态。如果消息状态一直是“已发送”，始终没有变成“已完成”，那么就说明下游服务始终没有处理成功，此时可靠消息服务就可以再次尝试重新投递消息到 MQ，让下游服务再次处理，只要下游服务的接口逻辑实现幂等即可。</p>
+<h3 id="基于K-V存储队列的高可用降级方案"><a href="#基于K-V存储队列的高可用降级方案" class="headerlink" title="基于K-V存储队列的高可用降级方案"></a>基于K-V存储队列的高可用降级方案</h3><img src="https://p.ipic.vip/442s96.png" alt="image-20250824113345403" style="zoom:45%;" />
+
+<h3 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h3><p>不依赖MQ，一旦 MQ中间件出现故障，立马自动降级为备用方案；</p>
+<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><p>如果连续n次重新尝试投递消息到 MQ都发现异常报错等问题，说明MQ 故障，此时自动感知并自动触发降级开关。</p>
+<p>例如：在没有高并发且消息量很少的场景，但对可用性要求高，此时可以使用Redis的K-V存储中的队列来进行替代。</p>
+<h3 id="实现方案"><a href="#实现方案" class="headerlink" title="实现方案"></a><strong>实现方案</strong></h3><p>根据每天的消息量，在k-v存储中固定划分上百个队列，有上百个 Key，保证每个 Key对应的数据结构中不会写入过多的消息。一旦发生MQ故障，可靠消息服务可以对每个消息通过 Hash算法，均匀的写入固定好的上百个 Key 对应的队列中。同时需要通过 ZK触发一个降级开关，整个系统在 MQ 这块的读和写全部立马降级。</p>
+<h3 id="下游服务消费-MQ-的降级感知"><a href="#下游服务消费-MQ-的降级感知" class="headerlink" title="下游服务消费 MQ 的降级感知"></a><strong>下游服务消费 MQ 的降级感知</strong></h3><p>下游服务消费 MQ，通过自行封装的组件，此时那个组件需要从 ZK感知到降级开关打开，首先会判断自己是否还能继续从 MQ消费到数据？如果不能，就开启多个线程，并发的从 KV存储的各个预设好的上百个队列中不断的获取数据。每次获取到一条数据，就交给下游服务的业务逻辑来执行。</p>
+<p>通过这套机制实现 MQ故障时的自动故障感知，以及自动降级。系统的负载和并发不是很高的话，用这套方案大致是没问题的。</p>
+<h3 id="故障的自动恢复"><a href="#故障的自动恢复" class="headerlink" title="故障的自动恢复"></a><strong>故障的自动恢复</strong></h3><p>如果降级开关打开后，自行封装的组件需要开启一个线程，每隔一段时间尝试给 MQ 投递一个消息看是否恢复。如果 MQ已经恢复可以正常投递消息，此时可以通过 ZK关闭降级开关，然后可靠消息服务继续投递消息到 MQ，下游服务在确认 KV存储的各个队列中已经没有数据后，就可以重新切换为从 MQ 消费消息。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/08/17/B1-%E5%88%86%E5%B8%83%E5%BC%8F/A1-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E7%82%B9/" rel="prev" title="分布式基础简介">
+                  <i class="fa fa-angle-left"></i> 分布式基础简介
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2025/08/23/B2-Spring%E6%8A%80%E6%9C%AF/A1-Bean%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/" rel="next" title="Bean生命周期">
+                  Bean生命周期 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC82MDYyOS8zNzEwMA=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">TurboCome</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/TurboCome" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script src="/js/third-party/comments/livere.js" defer></script>
+
+</body>
+</html>
