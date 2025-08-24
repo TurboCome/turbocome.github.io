@@ -26,19 +26,19 @@
 <meta property="og:site_name" content="TurboCome">
 <meta property="og:description" content="高并发主要分为三类高并发读： 商品系统 高并发写： 交易系统 高并发读+写：库存系统，是商品、交易系统的下游依赖，库存系统在读和写上都有高并发。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://p.ipic.vip/ag3hh3.png">
-<meta property="og:image" content="https://p.ipic.vip/0n4edb.png">
+<meta property="og:image" content="https://p.ipic.vip/xc58xf.png">
+<meta property="og:image" content="https://p.ipic.vip/3ac6jl.png">
 <meta property="og:image" content="https://p.ipic.vip/sugiqd.png">
 <meta property="og:image" content="https://p.ipic.vip/ke101w.png">
-<meta property="og:image" content="https://p.ipic.vip/10crxx.png">
-<meta property="og:image" content="https://p.ipic.vip/p23olo.png">
-<meta property="og:image" content="https://p.ipic.vip/mciwme.png">
+<meta property="og:image" content="https://p.ipic.vip/6vxfqn.png">
+<meta property="og:image" content="https://p.ipic.vip/qf7bge.png">
+<meta property="og:image" content="https://p.ipic.vip/lxfa4e.png">
 <meta property="article:published_time" content="2025-08-24T14:38:43.000Z">
-<meta property="article:modified_time" content="2025-08-24T13:29:15.677Z">
+<meta property="article:modified_time" content="2025-08-24T14:47:39.217Z">
 <meta property="article:author" content="TurboCome">
 <meta property="article:tag" content="高并发">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://p.ipic.vip/ag3hh3.png">
+<meta name="twitter:image" content="https://p.ipic.vip/xc58xf.png">
 
 
 <link rel="canonical" href="http://example.com/2025/08/24/C1-%E6%9E%B6%E6%9E%84/A1-%E9%AB%98%E5%B9%B6%E5%8F%91%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">
@@ -313,9 +313,7 @@
 
 
 <h3 id="一、高并发读场景"><a href="#一、高并发读场景" class="headerlink" title="一、高并发读场景"></a>一、高并发读场景</h3><h4 id="1-redis集群"><a href="#1-redis集群" class="headerlink" title="1.redis集群"></a>1.redis集群</h4><p>使用 redis集群，部署多个从节点，在写流量不高，且量级较小的单 key缓存数据的高流量读取场景中，如果读取的qps超过了一定阈值（比如redis的单实例10万qps），但又不想或不能引入内存缓存机制，可以采取该方案。</p>
-<img src="https://p.ipic.vip/ag3hh3.png" alt="image-20250824192332432" style="zoom:30%;" />
-
-
+<img src="https://p.ipic.vip/xc58xf.png" alt="image-20250824224252717" style="zoom:53%;" />
 
 <h4 id="2-内存缓存"><a href="#2-内存缓存" class="headerlink" title="2.内存缓存"></a>2.内存缓存</h4><p>适用于数据读取流量很高，且需要减少远端I&#x2F;O 和重复计算的场景，例如大型活动的榜单等业务场景。</p>
 <h5 id="数据量较小–client侧缓存"><a href="#数据量较小–client侧缓存" class="headerlink" title="数据量较小–client侧缓存"></a>数据量较小–<strong>client侧缓存</strong></h5><p> 优点：减少数据查询I&#x2F;O时间，节省server侧部署成本；</p>
@@ -323,7 +321,7 @@
 <h5 id="数据量较大–server侧内存缓存"><a href="#数据量较大–server侧内存缓存" class="headerlink" title="数据量较大–server侧内存缓存"></a>数据量较大–server侧内存缓存</h5><p> 好处：缓存逻辑有变时，无需client侧部署更新，缓存数据的更新可以更频繁，减少数据不一致的时间窗口；</p>
 <p> 缺点：如果请求量比较高，需要消耗较大的部署成本；</p>
 <h5 id="数据特别庞大–条件性内存缓存"><a href="#数据特别庞大–条件性内存缓存" class="headerlink" title="数据特别庞大–条件性内存缓存"></a>数据特别庞大–条件性内存缓存</h5><p>只缓存重要的、被访问概率高的数据，例如主播的榜单，可以只缓存10w+粉丝量的主播，这类主播的榜单查询流量往往更高，缓存命中率也更高。</p>
-<img src="https://p.ipic.vip/0n4edb.png" alt="image-20250824192817077" style="zoom:30%;" />
+<img src="https://p.ipic.vip/3ac6jl.png" alt="image-20250824224403475" style="zoom:50%;" />
 
 
 
@@ -349,9 +347,7 @@
 <h3 id="1-读写分离"><a href="#1-读写分离" class="headerlink" title="1.读写分离"></a>1.<strong>读写分离</strong></h3><p>将用户各类行为产生的榜单数据写到redis集群里，然后启动一个专门的任务定时将 redis中的榜单数据刷入具有更高查询性能的 memcached集群中，并基于memcached提供榜单数据的对外查询服务；</p>
 <p>对于redis集群，只需要扛住高流量的写入，对于memcachd集群，只需要扛住高流量的外部查询即可；</p>
 <p>读写分离关键在于隔离读&#x2F;写流量，避免两者同时作用于相同的数据源，读流程和写流程之间的数据传输则由一个独立的中间服务进行。</p>
-<img src="https://p.ipic.vip/10crxx.png" alt="image-20250824194103359" style="zoom:33%;" />
-
-
+<img src="https://p.ipic.vip/6vxfqn.png" alt="image-20250824224641512" style="zoom:50%;" />
 
 <h4 id="2-Redis扣减-异步MQ存储DB"><a href="#2-Redis扣减-异步MQ存储DB" class="headerlink" title="2.Redis扣减 + 异步MQ存储DB"></a>2.Redis扣减 + 异步MQ存储DB</h4><ul>
 <li><p>接收到秒杀请求时，<strong>在Redis中进行扣减库存，当Redis中的库存不足时，直接返回秒杀失败</strong>，减少数据库的访问；</p>
@@ -372,14 +368,14 @@
 <h4 id="1-主从数据不一致问题"><a href="#1-主从数据不一致问题" class="headerlink" title="1.主从数据不一致问题"></a>1.主从数据不一致问题</h4><p>Redis主从数据复制如果是异步方式，必然存在不一致的情况，同时为了整体的可用性，Redis默认是双AZ部署的，Redis集群的几个节点（默认是4个节点）是链式结构，数据只能从一个节点同步到另一个节点，再加上AZ间的网络延迟，这样最后一个从节点和主节点的数据差会进一步放大；</p>
 <p>对于变化非常频繁的库存值，这样的数据不一致是不能接受的，因为会导致实际有库存而用户查询到没有库存或没有库存用户查询到有库存；</p>
 <p>解决方案：业务服务器只读主节点，从节点只用来保障可用性。</p>
-<img src="https://p.ipic.vip/p23olo.png" alt="image-20250824194855852" style="zoom:20%;" />
+<img src="https://p.ipic.vip/qf7bge.png" alt="image-20250824224554265" style="zoom:50%;" />
 
 
 
 <h4 id="2-缓存和DB数据一致性"><a href="#2-缓存和DB数据一致性" class="headerlink" title="2.缓存和DB数据一致性"></a>2.缓存和DB数据一致性</h4><p><strong>1）同步机制：</strong>在更新完DB后，立即更新缓存，缓存更新失败，不阻塞业务；同时发送mq消息，消息体中包含本次缓存更新是否成功的标识；</p>
 <p><strong>2）异步修复：</strong>监听库存变更 mq消息，如果缓存更新失败，则对缓存&#x2F;DB数据进行check，如果不一致（实际可能间隔几秒，再check一次，连续3次不一致，认为真正的不一致），则进行修复。这种方式可以保障缓存&#x2F;DB数据秒级延迟后变得一致；</p>
 <p><strong>3）定时扫描：</strong>存储在运行过程中，可能存在主从切换，主从切换可能会引入数据不一致问题，但两类存储同时发生主从切换的概率是非常低的；通过一个定时任务，分别从redis和db出发，进行全量扫描，双向对比，然后对发现的不一致的数据进行修复；</p>
-<img src="https://p.ipic.vip/mciwme.png" alt="image-20250824195511250" style="zoom:43%;" />
+<img src="https://p.ipic.vip/lxfa4e.png" alt="image-20250824224514668" style="zoom:50%;" />
 
 
 
