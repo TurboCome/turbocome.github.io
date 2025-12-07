@@ -19,24 +19,32 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="学而不思则罔，思而不学则殆！">
-<meta property="og:type" content="website">
-<meta property="og:title" content="TurboCome">
-<meta property="og:url" content="http://example.com/archives/2025/06/index.html">
+    <meta name="description" content="DDD概念概念：DDD是一种软件设计方法，主要以应对复杂的业务需求，通过抽象、分治的过程，合理的拆分为独立的多个微服务，从而分而治之。 充血模型充血模型，指将对象的属性信息与行为逻辑聚合到一个类中，常用的手段如：在对象内提供属于当前对象的信息校验、拼装缓存Key、不含服务接口调用的逻辑处理等。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DDD概念理论">
+<meta property="og:url" content="http://example.com/2025/12/01/C3-%E9%A2%86%E5%9F%9F%E8%AE%BE%E8%AE%A1/A1-DDD%E6%A6%82%E5%BF%B5%E7%90%86%E8%AE%BA/index.html">
 <meta property="og:site_name" content="TurboCome">
-<meta property="og:description" content="学而不思则罔，思而不学则殆！">
+<meta property="og:description" content="DDD概念概念：DDD是一种软件设计方法，主要以应对复杂的业务需求，通过抽象、分治的过程，合理的拆分为独立的多个微服务，从而分而治之。 充血模型充血模型，指将对象的属性信息与行为逻辑聚合到一个类中，常用的手段如：在对象内提供属于当前对象的信息校验、拼装缓存Key、不含服务接口调用的逻辑处理等。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/Library/Application%20Support/typora-user-images/image-20251207221102975.png">
+<meta property="og:image" content="https://p.ipic.vip/xcgnzj.png">
+<meta property="og:image" content="https://p.ipic.vip/3973hu.png">
+<meta property="og:image" content="https://p.ipic.vip/0br0pc.png">
+<meta property="article:published_time" content="2025-12-01T14:38:43.000Z">
+<meta property="article:modified_time" content="2025-12-07T14:15:46.624Z">
 <meta property="article:author" content="TurboCome">
+<meta property="article:tag" content="领域设计">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/Library/Application%20Support/typora-user-images/image-20251207221102975.png">
 
 
-<link rel="canonical" href="http://example.com/archives/2025/06/">
+<link rel="canonical" href="http://example.com/2025/12/01/C3-%E9%A2%86%E5%9F%9F%E8%AE%BE%E8%AE%A1/A1-DDD%E6%A6%82%E5%BF%B5%E7%90%86%E8%AE%BA/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"archives/2025/06/index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2025/12/01/C3-%E9%A2%86%E5%9F%9F%E8%AE%BE%E8%AE%A1/A1-DDD%E6%A6%82%E5%BF%B5%E7%90%86%E8%AE%BA/","path":"2025/12/01/C3-领域设计/A1-DDD概念理论/","title":"DDD概念理论"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>归档 | TurboCome</title>
+<title>DDD概念理论 | TurboCome</title>
   
 
   <script src="/js/third-party/analytics/baidu-analytics.js" defer></script>
@@ -105,7 +113,7 @@
 
     <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
-      <h1 class="site-title">TurboCome</h1>
+      <p class="site-title">TurboCome</p>
       <i class="logo-line"></i>
     </a>
       <p class="site-subtitle" itemprop="description">淡泊明志，宁静致远！</p>
@@ -159,7 +167,7 @@
   
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -172,6 +180,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#DDD%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">DDD概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%85%E8%A1%80%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">充血模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B4%AB%E8%A1%80-%E5%85%85%E8%A1%80%E6%A8%A1%E5%9E%8B%E5%AF%B9%E6%AF%94"><span class="nav-number">2.1.</span> <span class="nav-text">贫血|充血模型对比</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E4%BD%93-%E8%81%9A%E5%90%88-%E5%80%BC%E5%AF%B9%E8%B1%A1"><span class="nav-number">3.</span> <span class="nav-text">实体|聚合|值对象</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%81%9A%E5%90%88%E5%AF%B9%E8%B1%A1"><span class="nav-number">3.1.</span> <span class="nav-text">聚合对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E4%BD%93%E5%AF%B9%E8%B1%A1"><span class="nav-number">3.2.</span> <span class="nav-text">实体对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%80%BC%E5%AF%B9%E8%B1%A1"><span class="nav-number">3.3.</span> <span class="nav-text">值对象</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%93%E5%82%A8%E5%B1%82"><span class="nav-number">4.</span> <span class="nav-text">仓储层</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -224,130 +233,145 @@
 
     </div>
 
-    <div class="main-inner archive posts-collapse">
+    <div class="main-inner post posts-expand">
 
 
   
+
+
+<div class="post-block">
   
   
-  <div class="post-block">
-    <div class="post-content">
-      <div class="collection-title">
-        <span class="collection-header">嗯..! 目前共计 30 篇日志。 继续努力。</span>
-      </div>
 
-      
-    <div class="collection-year">
-      <span class="collection-header">2025<span class="collection-year-count">30</span></span>
-    </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/12/01/C3-%E9%A2%86%E5%9F%9F%E8%AE%BE%E8%AE%A1/A1-DDD%E6%A6%82%E5%BF%B5%E7%90%86%E8%AE%BA/">
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2025-06-22T19:38:43+08:00"
-              content="2025-06-22">
-          06-22
-        </time>
-      </div>
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar/avatar.jpg">
+      <meta itemprop="name" content="TurboCome">
+    </span>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2025/06/22/A3-%E7%BC%93%E5%AD%98/A4-%E7%BC%93%E5%AD%98%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/" itemprop="url">
-            <span itemprop="name">缓存常见问题</span>
-          </a>
-      </div>
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TurboCome">
+      <meta itemprop="description" content="学而不思则罔，思而不学则殆！">
+    </span>
 
-      
-    </header>
-  </article>
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="DDD概念理论 | TurboCome">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          DDD概念理论
+        </h1>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2025-06-19T20:04:00+08:00"
-              content="2025-06-19">
-          06-19
-        </time>
-      </div>
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2025/06/19/A3-%E7%BC%93%E5%AD%98/A2-Redis%E6%8C%81%E4%B9%85%E5%8C%96/" itemprop="url">
-            <span itemprop="name">Redis持久化&集群</span>
-          </a>
-      </div>
+      <time title="创建时间：2025-12-01 22:38:43" itemprop="dateCreated datePublished" datetime="2025-12-01T22:38:43+08:00">2025-12-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E9%A2%86%E5%9F%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">领域设计</span></a>
+        </span>
+    </span>
 
-      
-    </header>
-  </article>
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2025-06-15T20:14:43+08:00"
-              content="2025-06-15">
-          06-15
-        </time>
-      </div>
+          
+        </div>
+      </header>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2025/06/15/A3-%E7%BC%93%E5%AD%98/A1-Redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url">
-            <span itemprop="name">Redis基本数据结构</span>
-          </a>
-      </div>
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="DDD概念"><a href="#DDD概念" class="headerlink" title="DDD概念"></a>DDD概念</h3><p>概念：DDD是一种软件设计方法，主要以应对复杂的业务需求，通过抽象、分治的过程，合理的拆分为独立的多个微服务，从而分而治之。</p>
+<h3 id="充血模型"><a href="#充血模型" class="headerlink" title="充血模型"></a>充血模型</h3><p>充血模型，指将对象的属性信息与行为逻辑聚合到一个类中，常用的手段如：在对象内提供属于当前对象的信息校验、拼装缓存Key、不含服务接口调用的逻辑处理等。</p>
+<span id="more"></span> 
 
-      
-    </header>
-  </article>
+<img src="../../../../../Library/Application%20Support/typora-user-images/image-20251207221102975.png" alt="image-20251207221102975" style="zoom:40%;" />
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2025-06-08T20:14:43+08:00"
-              content="2025-06-08">
-          06-08
-        </time>
-      </div>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2025/06/08/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Kafka%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" itemprop="url">
-            <span itemprop="name">Kafka性能优化</span>
-          </a>
-      </div>
 
-      
-    </header>
-  </article>
+<h4 id="贫血-充血模型对比"><a href="#贫血-充血模型对比" class="headerlink" title="贫血|充血模型对比"></a>贫血|充血模型对比</h4><p>充血模型下，以一个领域功能为聚合，拆分一个领域内所需的 Service 为领域服务，VO、Req、Res 重新设计为领域对象，DAO、Redis 等持久化操作为仓储等。</p>
+<p>举例：一套账户服务中，授信认证、开户、提额降额等，每一个都是一个独立的领域，在每个独立的领域内，创建自身领域所需的各项信息。</p>
+<img src="https://p.ipic.vip/xcgnzj.png" alt="image-20251207221202511" style="zoom:40%;" />
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2025-06-02T20:14:43+08:00"
-              content="2025-06-02">
-          06-02
-        </time>
-      </div>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2025/06/02/A2-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/Kafka%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" itemprop="url">
-            <span itemprop="name">Kafka消息队列</span>
-          </a>
-      </div>
 
-      
-    </header>
-  </article>
+<h3 id="实体-聚合-值对象"><a href="#实体-聚合-值对象" class="headerlink" title="实体|聚合|值对象"></a>实体|聚合|值对象</h3><img src="https://p.ipic.vip/3973hu.png" alt="image-20251207221257295" style="zoom:30%;" />
+
+<h4 id="聚合对象"><a href="#聚合对象" class="headerlink" title="聚合对象"></a>聚合对象</h4><p>概念：聚合是领域模型中的一个关键概念，它是一组具有内聚性的相关对象（实体对象）的集合，这些对象一起工作以执行某些业务规则或操作。聚合定义了一组对象的边界，这些对象可以被视为一个单一的单元进行处理。</p>
+<p>聚合内事务一致性，聚合外最终一致性。一个订单的聚合，会涵盖：下单用户实体对象、订单实体、订单明细实体和订单收货四级地址值对象。</p>
+<p>特征：</p>
+<p>一致性边界（聚合的内部对象状态变化是一致的）</p>
+<p>根实体：每个聚合都有一个根实体（Aggregate Root），它是聚合的入口点。根实体拥有一个全局唯一的标识符，其他对象通过根实体与聚合交互。</p>
+<h4 id="实体对象"><a href="#实体对象" class="headerlink" title="实体对象"></a>实体对象</h4><p>概念：实体 &#x3D; 唯一标识 + 状态属性 + 行为动作（功能），是DDD中一个基本构建块，代表了具有唯一标识的领域对象。实体不仅仅包含数据（状态属性），还包含相关的行为（功能），并且它的标识在整个生命周期中保持不变。</p>
+<p>依托持久化层数据以领域服务功能目标为指导设计的领域对象。持久化PO对象是原子类对象，不具有业务语义，而实体对象是具有业务语义且有唯一标识的对象，跟随于领域服务方法的全生命周期对象。</p>
+<p>例如：用户PO持久化对象，会涵盖，用户的开户实体、授信实体、额度实体对象。也包括如商品下单时候的购物车实体对象。</p>
+<p>特征：领域标识、唯一标识（订单ID）</p>
+<h4 id="值对象"><a href="#值对象" class="headerlink" title="值对象"></a>值对象</h4><p>概念：值对象是由一组属性组成，它们共同描述了一个领域概念。与实体（Entity）不同，值对象不需要有一个唯一的标识符来区分它们。值对象通常是不可变的，一旦创建，它们的状态就不会改变。</p>
+<p>在领域服务方法的生命周期过程内是不可变对象，也没有唯一标识。</p>
+<p>配合实体对象使用，为实体对象提供对象属性值的描述，例如：公司雇员的级别值对象，下单商品收货的四级地址信息对象。</p>
+<p>特征：不可变、可复用性（可在不同实体对象中使用）</p>
+<h3 id="仓储层"><a href="#仓储层" class="headerlink" title="仓储层"></a>仓储层</h3><p>Repository模式是DDD中的一个核心概念，它有助于保持领域模型的聚焦和清晰，同时提供了灵活、可测试和可维护的数据访问策略。</p>
+<p>仓储解耦的手段使用了依赖倒置的设计，所有领域需要的外部服务，不再直接引入外部的服务，而是通过定义接口的方式，让基础设施层实现领域层接口（仓储&#x2F;适配器）的方式来处理。</p>
+<img src="https://p.ipic.vip/0br0pc.png" alt="image-20251207221429376" style="zoom:30%;" />
+
+
+
+
 
 
     </div>
-  </div>
-  
-  
-  
 
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%A2%86%E5%9F%9F%E8%AE%BE%E8%AE%A1/" rel="tag"># 领域设计</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/09/07/C2-%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/A5-%E8%B4%A3%E4%BB%BB%E9%93%BE%E6%A8%A1%E5%BC%8F/" rel="prev" title="责任链模式">
+                  <i class="fa fa-angle-left"></i> 责任链模式
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC82MDYyOS8zNzEwMA=="></div>
 </div>
   </main>
 
