@@ -26,16 +26,16 @@
 <meta property="og:site_name" content="TurboCome">
 <meta property="og:description" content="DDD概念概念：DDD是一种软件设计方法，主要以应对复杂的业务需求，通过抽象、分治的过程，合理的拆分为独立的多个微服务，从而分而治之。 充血模型充血模型，指将对象的属性信息与行为逻辑聚合到一个类中，常用的手段如：在对象内提供属于当前对象的信息校验、拼装缓存Key、不含服务接口调用的逻辑处理等。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/Library/Application%20Support/typora-user-images/image-20251207221102975.png">
+<meta property="og:image" content="https://p.ipic.vip/88qp3c.png">
 <meta property="og:image" content="https://p.ipic.vip/xcgnzj.png">
 <meta property="og:image" content="https://p.ipic.vip/3973hu.png">
 <meta property="og:image" content="https://p.ipic.vip/0br0pc.png">
 <meta property="article:published_time" content="2025-12-01T14:38:43.000Z">
-<meta property="article:modified_time" content="2025-12-07T14:15:46.624Z">
+<meta property="article:modified_time" content="2025-12-07T14:22:11.814Z">
 <meta property="article:author" content="TurboCome">
 <meta property="article:tag" content="领域设计">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/Library/Application%20Support/typora-user-images/image-20251207221102975.png">
+<meta name="twitter:image" content="https://p.ipic.vip/88qp3c.png">
 
 
 <link rel="canonical" href="http://example.com/2025/12/01/C3-%E9%A2%86%E5%9F%9F%E8%AE%BE%E8%AE%A1/A1-DDD%E6%A6%82%E5%BF%B5%E7%90%86%E8%AE%BA/">
@@ -306,17 +306,17 @@
 <h3 id="充血模型"><a href="#充血模型" class="headerlink" title="充血模型"></a>充血模型</h3><p>充血模型，指将对象的属性信息与行为逻辑聚合到一个类中，常用的手段如：在对象内提供属于当前对象的信息校验、拼装缓存Key、不含服务接口调用的逻辑处理等。</p>
 <span id="more"></span> 
 
-<img src="../../../../../Library/Application%20Support/typora-user-images/image-20251207221102975.png" alt="image-20251207221102975" style="zoom:40%;" />
+<img src="https://p.ipic.vip/88qp3c.png" alt="image-20251207222124744" style="zoom:43%;" />
 
 
 
 <h4 id="贫血-充血模型对比"><a href="#贫血-充血模型对比" class="headerlink" title="贫血|充血模型对比"></a>贫血|充血模型对比</h4><p>充血模型下，以一个领域功能为聚合，拆分一个领域内所需的 Service 为领域服务，VO、Req、Res 重新设计为领域对象，DAO、Redis 等持久化操作为仓储等。</p>
 <p>举例：一套账户服务中，授信认证、开户、提额降额等，每一个都是一个独立的领域，在每个独立的领域内，创建自身领域所需的各项信息。</p>
-<img src="https://p.ipic.vip/xcgnzj.png" alt="image-20251207221202511" style="zoom:40%;" />
+<img src="https://p.ipic.vip/xcgnzj.png" alt="image-20251207221202511" style="zoom:34%;" />
 
 
 
-<h3 id="实体-聚合-值对象"><a href="#实体-聚合-值对象" class="headerlink" title="实体|聚合|值对象"></a>实体|聚合|值对象</h3><img src="https://p.ipic.vip/3973hu.png" alt="image-20251207221257295" style="zoom:30%;" />
+<h3 id="实体-聚合-值对象"><a href="#实体-聚合-值对象" class="headerlink" title="实体|聚合|值对象"></a>实体|聚合|值对象</h3><img src="https://p.ipic.vip/3973hu.png" alt="image-20251207221257295" style="zoom:27%;" />
 
 <h4 id="聚合对象"><a href="#聚合对象" class="headerlink" title="聚合对象"></a>聚合对象</h4><p>概念：聚合是领域模型中的一个关键概念，它是一组具有内聚性的相关对象（实体对象）的集合，这些对象一起工作以执行某些业务规则或操作。聚合定义了一组对象的边界，这些对象可以被视为一个单一的单元进行处理。</p>
 <p>聚合内事务一致性，聚合外最终一致性。一个订单的聚合，会涵盖：下单用户实体对象、订单实体、订单明细实体和订单收货四级地址值对象。</p>
@@ -333,7 +333,7 @@
 <p>特征：不可变、可复用性（可在不同实体对象中使用）</p>
 <h3 id="仓储层"><a href="#仓储层" class="headerlink" title="仓储层"></a>仓储层</h3><p>Repository模式是DDD中的一个核心概念，它有助于保持领域模型的聚焦和清晰，同时提供了灵活、可测试和可维护的数据访问策略。</p>
 <p>仓储解耦的手段使用了依赖倒置的设计，所有领域需要的外部服务，不再直接引入外部的服务，而是通过定义接口的方式，让基础设施层实现领域层接口（仓储&#x2F;适配器）的方式来处理。</p>
-<img src="https://p.ipic.vip/0br0pc.png" alt="image-20251207221429376" style="zoom:30%;" />
+<img src="https://p.ipic.vip/0br0pc.png" alt="image-20251207221429376" style="zoom:25%;" />
 
 
 
